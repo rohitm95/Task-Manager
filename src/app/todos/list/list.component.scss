@@ -1,0 +1,44 @@
+.spacer {
+  flex: 1 1 auto;
+}
+
+table {
+  width: 100%;
+  overflow: auto;
+}
+
+.title-container {
+  font-size: 20px;
+  font-weight: 700;
+  background-color: #fff;
+  margin: 5px 5px 5px 0;
+  display: flex;
+}
+
+.img-list {
+  height: 42px;
+  width: 42px;
+  border-radius: 50%;
+}
+
+.action-header {
+  padding-left: 30px;
+}
+
+.title-container,
+.table-container {
+  position: relative;
+}
+
+.example-loading-shade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 56px;
+  right: 0;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

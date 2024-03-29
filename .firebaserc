@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "to-do-app-3569d": {
+      "hosting": {
+        "task-manager": [
+          "to-do-app-3569d"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "to-do-app-3569d"
+  }
+}

@@ -1,0 +1,36 @@
+.menu-toggle,
+.sidenav-toggle {
+  padding: 0;
+}
+
+.menu-img {
+  border-radius: 50%;
+  height: 34px;
+  width: 34px;
+}
+
+.sidenav-toggle {
+  min-width: 50px;
+
+  mat-icon {
+    font-size: 30px;
+    height: 50px;
+    width: 50px;
+    line-height: 50px;
+    color: #000;
+  }
+}
+
+mat-toolbar.mat-toolbar {
+  background-color: #fff;
+}
+
+.menu-toggle {
+  mat-icon {
+    font-size: 30px;
+    height: 50px;
+    width: 50px;
+    line-height: 50px;
+    color: #000;
+  }
+}

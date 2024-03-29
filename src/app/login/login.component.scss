@@ -1,0 +1,30 @@
+mat-form-field {
+  width: 300px;
+  gap: 5px;
+}
+
+.login-form {
+  padding: 30px;
+}
+
+form {
+  padding: 10px;
+}
+
+.not-a-member {
+  line-height: 50px;
+
+  .sign-up {
+    font-weight: bold;
+    color: #000;
+    cursor: pointer;
+  }
+}
+
+.sign-in {
+  font-size: 40px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 80px;
+  letter-spacing: 0;
+}
