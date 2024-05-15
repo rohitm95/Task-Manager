@@ -22,6 +22,7 @@ export class TodoService {
   private availableTasks: Todo[] = [];
   docRef;
   private spinnerService = inject(SpinnerService);
+  private userId;
   constructor(
     private snackbarService: SnackbarService,
     private broadcast: BroadcasterService,
@@ -29,6 +30,7 @@ export class TodoService {
   ) {}
 
   fetchUserTasks(userId: string) {
+    this.userId = userId;
     const userTasksQuery = query(
       collection(this.fireStore, 'availableTasks'),
       where('userId', '==', userId)
@@ -59,44 +61,48 @@ export class TodoService {
     });
   }
 
-  fetchAvailableTasks() {
-    const availableTasksCollection = from(
-      getDocs(collection(this.fireStore, 'availableTasks'))
-    );
-    availableTasksCollection.subscribe({
-      next: (querySnapshot) => {
-        let docs = querySnapshot.docs;
-        this.availableTasks = docs.map((doc) => {
-          return {
-            id: doc.id,
-            title: doc.data()['title'],
-            description: doc.data()['description'],
-            status: doc.data()['status'],
-            date: doc.data()['date'],
-          };
-        });
-        this.broadcast.broadcast('availableTasks', {
-          tasks: this.availableTasks,
-        });
-        this.spinnerService.showSpinner.next(false);
-      },
-      error: (error) => {
-        this.snackbarService.showSnackbar(
-          'Fetching tasks failed, please try again later',
-          null,
-          3000
-        );
-        this.broadcast.broadcast('availableTasks', { tasks: null });
-      },
-    });
-  }
+  // fetchAvailableTasks() {
+  //   const availableTasksCollection = from(
+  //     getDocs(collection(this.fireStore, 'availableTasks'))
+  //   );
+  //   availableTasksCollection.subscribe({
+  //     next: (querySnapshot) => {
+  //       let docs = querySnapshot.docs;
+  //       this.availableTasks = docs.map((doc) => {
+  //         return {
+  //           id: doc.id,
+  //           title: doc.data()['title'],
+  //           description: doc.data()['description'],
+  //           status: doc.data()['status'],
+  //           date: doc.data()['date'],
+  //         };
+  //       });
+  //       this.broadcast.broadcast('availableTasks', {
+  //         tasks: this.availableTasks,
+  //       });
+  //       this.spinnerService.showSpinner.next(false);
+  //     },
+  //     error: (error) => {
+  //       this.snackbarService.showSnackbar(
+  //         'Fetching tasks failed, please try again later',
+  //         null,
+  //         3000
+  //       );
+  //       this.broadcast.broadcast('availableTasks', { tasks: null });
+  //     },
+  //   });
+  // }
 
   async addTaskToDatabase(task: Todo) {
-    let newTask = { ...task, date: new Date().toISOString() };
+    let newTask = {
+      ...task,
+      date: new Date().toISOString(),
+      userId: this.userId,
+    };
     await addDoc(collection(this.fireStore, 'availableTasks'), newTask)
       .then((response) => {
+        this.fetchUserTasks(this.userId);
         this.snackbarService.showSnackbar('Task Created!', null, 3000);
-        this.fetchAvailableTasks();
       })
       .catch((error) => {
         this.snackbarService.showSnackbar(
@@ -118,8 +124,9 @@ export class TodoService {
 
     await updateDoc(this.docRef, data)
       .then((response) => {
-        this.snackbarService.showSnackbar('Task Updated!', null, 3000);
+        this.fetchUserTasks(this.userId);
         this.broadcast.broadcast('updateTask', { status: 'success' });
+        this.snackbarService.showSnackbar('Task Updated!', null, 3000);
         this.spinnerService.showSpinner.next(false);
       })
       .catch((error) => {
@@ -136,13 +143,14 @@ export class TodoService {
 
     await deleteDoc(this.docRef)
       .then((response) => {
+        this.fetchUserTasks(this.userId);
+        this.broadcast.broadcast('deleteTask', { status: 'success' });
         this.spinnerService.showSpinner.next(false);
         this.snackbarService.showSnackbar(
           'Task deleted SUccessfully!',
           null,
           3000
         );
-        this.broadcast.broadcast('deleteTask', { status: 'success' });
       })
       .catch((error) => {
         this.snackbarService.showSnackbar(
