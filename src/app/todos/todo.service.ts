@@ -10,27 +10,34 @@ import {
   updateDoc,
   deleteDoc,
   getDoc,
+  query,
+  where,
 } from '@angular/fire/firestore';
 import { SnackbarService } from '../shared/snackbar.service';
 import { BroadcasterService } from '../shared/broadcaster.service';
+import { SpinnerService } from '../shared/spinner.service';
 
 @Injectable({ providedIn: 'root' })
 export class TodoService {
   private availableTasks: Todo[] = [];
   docRef;
-  showSpinner = new Subject<boolean>();
+  private spinnerService = inject(SpinnerService);
   constructor(
     private snackbarService: SnackbarService,
     private broadcast: BroadcasterService,
     public fireStore: Firestore
   ) {}
 
-  fetchAvailableTasks() {
-    const availableTasksCollection = from(
-      getDocs(collection(this.fireStore, 'availableTasks'))
+  fetchUserTasks(userId: string) {
+    const userTasksQuery = query(
+      collection(this.fireStore, 'availableTasks'),
+      where('userId', '==', userId)
     );
-    availableTasksCollection.subscribe(
-      (querySnapshot) => {
+
+    const userTasksCollection = from(getDocs(userTasksQuery));
+
+    userTasksCollection.subscribe({
+      next: (querySnapshot) => {
         let docs = querySnapshot.docs;
         this.availableTasks = docs.map((doc) => {
           return {
@@ -44,17 +51,44 @@ export class TodoService {
         this.broadcast.broadcast('availableTasks', {
           tasks: this.availableTasks,
         });
-        this.showSpinner.next(false);
+        this.spinnerService.showSpinner.next(false);
       },
-      (error) => {
+      error: (error) => {
+        console.error('Error fetching user tasks: ', error);
+      },
+    });
+  }
+
+  fetchAvailableTasks() {
+    const availableTasksCollection = from(
+      getDocs(collection(this.fireStore, 'availableTasks'))
+    );
+    availableTasksCollection.subscribe({
+      next: (querySnapshot) => {
+        let docs = querySnapshot.docs;
+        this.availableTasks = docs.map((doc) => {
+          return {
+            id: doc.id,
+            title: doc.data()['title'],
+            description: doc.data()['description'],
+            status: doc.data()['status'],
+            date: doc.data()['date'],
+          };
+        });
+        this.broadcast.broadcast('availableTasks', {
+          tasks: this.availableTasks,
+        });
+        this.spinnerService.showSpinner.next(false);
+      },
+      error: (error) => {
         this.snackbarService.showSnackbar(
           'Fetching tasks failed, please try again later',
           null,
           3000
         );
         this.broadcast.broadcast('availableTasks', { tasks: null });
-      }
-    );
+      },
+    });
   }
 
   async addTaskToDatabase(task: Todo) {
@@ -86,7 +120,7 @@ export class TodoService {
       .then((response) => {
         this.snackbarService.showSnackbar('Task Updated!', null, 3000);
         this.broadcast.broadcast('updateTask', { status: 'success' });
-        this.showSpinner.next(false);
+        this.spinnerService.showSpinner.next(false);
       })
       .catch((error) => {
         this.snackbarService.showSnackbar(
@@ -102,13 +136,13 @@ export class TodoService {
 
     await deleteDoc(this.docRef)
       .then((response) => {
+        this.spinnerService.showSpinner.next(false);
         this.snackbarService.showSnackbar(
           'Task deleted SUccessfully!',
           null,
           3000
         );
         this.broadcast.broadcast('deleteTask', { status: 'success' });
-        this.showSpinner.next(false);
       })
       .catch((error) => {
         this.snackbarService.showSnackbar(
@@ -125,7 +159,7 @@ export class TodoService {
       const docSnap = await getDoc(this.docRef);
       if (docSnap.exists()) {
         this.broadcast.broadcast('taskDetail', { data: docSnap.data() });
-        this.showSpinner.next(false);
+        this.spinnerService.showSpinner.next(false);
       } else {
         console.log('Document does not exist');
       }
@@ -137,7 +171,7 @@ export class TodoService {
         3000
       );
       this.broadcast.broadcast('taskDetail', { data: null });
-      this.showSpinner.next(false);
+      this.spinnerService.showSpinner.next(false);
     }
   }
 }

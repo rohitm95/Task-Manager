@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { AuthService } from './shared/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -10,12 +9,8 @@ import { AuthService } from './shared/auth.service';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'Task Manager';
 
-  constructor(public authService: AuthService) {}
-
-  ngOnInit(): void {
-    this.authService.initAuthListener();
-  }
+  constructor() {}
 }

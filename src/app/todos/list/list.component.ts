@@ -5,11 +5,11 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
+  inject,
 } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { MatPaginatorModule } from '@angular/material/paginator';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
@@ -36,6 +36,8 @@ import { Todo } from '../todo.model';
 import { BroadcasterService } from '../../shared/broadcaster.service';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { Auth, authState } from '@angular/fire/auth';
+import { SpinnerService } from '../../shared/spinner.service';
 
 @Component({
   selector: 'app-list',
@@ -45,7 +47,6 @@ import { Router, RouterModule } from '@angular/router';
     MatIconModule,
     MatTableModule,
     MatTooltipModule,
-    MatPaginatorModule,
     MatButtonModule,
     MatSortModule,
     MatInputModule,
@@ -63,6 +64,9 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
   data: Todo[] = [];
   isLoadingResults = true;
   subscription: Subscription;
+  private spinnerService = inject(SpinnerService);
+  private auth: Auth = inject(Auth);
+  authState$ = authState(this.auth);
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -80,13 +84,20 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
       this.data = response.tasks;
     });
 
-    this.subscription = this.todoService.showSpinner.subscribe((response) => {
-      this.isLoadingResults = response;
+    this.subscription = this.spinnerService.showSpinner.subscribe(
+      (response) => {
+        this.isLoadingResults = response;
+      }
+    );
+
+    this.authState$.subscribe((user) => {
+      if (user) {
+        this.todoService.fetchUserTasks(user.uid);
+      }
     });
   }
 
   ngAfterViewInit(): void {
-    this.todoService.fetchAvailableTasks();
     this.dataSource.sort = this.sort;
   }
 
@@ -98,7 +109,7 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
     const dialogRef = this.dialog.open(DialogDeleteTaskComponent);
 
     dialogRef.afterClosed().subscribe((response) => {
-      this.todoService.showSpinner.next(true);
+      this.spinnerService.showSpinner.next(true);
       this.todoService.deleteTask(id);
     });
   }
@@ -157,11 +168,12 @@ export class DialogAddTaskComponent implements OnInit {
   ];
   editMode;
   taskId;
+  todoService = inject(TodoService)
+  spinnerService = inject(SpinnerService)
 
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<DialogAddTaskComponent>,
-    public todoService: TodoService,
     @Inject(MAT_DIALOG_DATA) public data
   ) {}
 
@@ -186,7 +198,7 @@ export class DialogAddTaskComponent implements OnInit {
   }
 
   createTask() {
-    this.todoService.showSpinner.next(true);
+    this.spinnerService.showSpinner.next(true);
     this.todoService.addTaskToDatabase(this.toDoForm.value);
   }
 
@@ -196,7 +208,7 @@ export class DialogAddTaskComponent implements OnInit {
   }
 
   updateTask() {
-    this.todoService.showSpinner.next(true);
+    this.spinnerService.showSpinner.next(true);
     const payload = {
       id: this.taskId,
       taskData: this.toDoForm.value,

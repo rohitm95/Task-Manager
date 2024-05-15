@@ -9,5 +9,22 @@ import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideRouter(routes), provideClientHydration(), provideAnimationsAsync(), importProvidersFrom(provideFirebaseApp(() => initializeApp({"projectId":"to-do-app-3569d","appId":"1:665738202763:web:c08911a6f36c6c3bbbce8e","storageBucket":"to-do-app-3569d.appspot.com","apiKey":"AIzaSyDmWSsxJJAlzt60_hMRcT9JGGm4EiWqkbw","authDomain":"to-do-app-3569d.firebaseapp.com","messagingSenderId":"665738202763","measurementId":"G-0B32KQX4NF"}))), importProvidersFrom(provideAuth(() => getAuth())), importProvidersFrom(provideFirestore(() => getFirestore()))]
+  providers: [
+    provideRouter(routes),
+    provideClientHydration(),
+    provideAnimationsAsync(),
+    provideFirebaseApp(() =>
+      initializeApp({
+        projectId: 'to-do-app-3569d',
+        appId: '1:665738202763:web:c08911a6f36c6c3bbbce8e',
+        storageBucket: 'to-do-app-3569d.appspot.com',
+        apiKey: 'AIzaSyDmWSsxJJAlzt60_hMRcT9JGGm4EiWqkbw',
+        authDomain: 'to-do-app-3569d.firebaseapp.com',
+        messagingSenderId: '665738202763',
+        measurementId: 'G-0B32KQX4NF',
+      })
+    ),
+    provideAuth(() => getAuth()),
+    provideFirestore(() => getFirestore()),
+  ],
 };

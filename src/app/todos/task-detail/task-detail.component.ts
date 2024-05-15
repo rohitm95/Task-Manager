@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { TodoService } from '../todo.service';
 import { MatCardModule } from '@angular/material/card';
@@ -11,6 +11,7 @@ import {
   DialogDeleteTaskComponent,
 } from '../list/list.component';
 import { Subscription } from 'rxjs';
+import { SpinnerService } from '../../shared/spinner.service';
 
 @Component({
   selector: 'app-task-detail',
@@ -23,6 +24,7 @@ export class TaskDetailComponent implements OnInit, OnDestroy {
   taskId = '';
   taskDetails;
   isLoadingResults = true;
+  spinnerService = inject(SpinnerService);
   subscription: Subscription;
   constructor(
     public router: Router,
@@ -42,7 +44,7 @@ export class TaskDetailComponent implements OnInit, OnDestroy {
     this.broadcast.recieve('deleteTask', () => {
       this.router.navigate(['/todo-list']);
     });
-    this.subscription = this.todoService.showSpinner.subscribe((response) => {
+    this.subscription = this.spinnerService.showSpinner.subscribe((response) => {
       this.isLoadingResults = response;
     });
   }
@@ -64,7 +66,7 @@ export class TaskDetailComponent implements OnInit, OnDestroy {
   deleteTask() {
     const dialogRef = this.dialog.open(DialogDeleteTaskComponent);
     dialogRef.afterClosed().subscribe((response) => {
-      this.todoService.showSpinner.next(true);
+      this.spinnerService.showSpinner.next(true);
       this.todoService.deleteTask(this.taskId);
     });
   }

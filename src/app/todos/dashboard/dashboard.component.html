@@ -3,14 +3,14 @@
     <mat-toolbar class="logo-toolbar">
       <img
         src="https://firebasestorage.googleapis.com/v0/b/to-do-app-3569d.appspot.com/o/default-profile-pic.png?alt=media&token=09a77c81-9576-438c-8c35-a74119a26103"
-        class="menu-img" />
+        class="menu-img"
+        alt="default profile"
+      />
     </mat-toolbar>
-    <h3 class="margin-l-10">Welcome! @if(user) { {{ displayName }} } </h3>
+    <h3 class="margin-l-10">Welcome! @if(user) { {{ displayName }} }</h3>
     <mat-nav-list>
       <mat-list-item class="link">Profile</mat-list-item>
-      <mat-list-item (click)="logOut()">
-        Logout
-      </mat-list-item>
+      <mat-list-item (click)="logOut()"> Logout </mat-list-item>
     </mat-nav-list>
   </mat-sidenav>
 
