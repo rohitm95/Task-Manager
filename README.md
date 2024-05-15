@@ -1,6 +1,13 @@
-# TaskManager
+# Task Manager
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.9.
+
+## Running Steps
+
+1. Open the terminal and type 'npm install'.
+2. Type 'ng serve' and wait for the application to run.
+3. Open the application in the browser.
+4. Login with the credentials. If you don't have an account create using the sign-up button.
 
 ## Development server
 
@@ -12,7 +19,7 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Run `ng build` to build the project. The build artefacts will be stored in the `dist/` directory.
 
 ## Running unit tests
 
