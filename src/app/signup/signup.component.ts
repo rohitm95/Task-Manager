@@ -55,9 +55,8 @@ export class SignupComponent implements OnInit {
   }
 
   signup(formvalue: FormGroup) {
-    this.authService
-      .registerUser(formvalue.value)
-      .then((result) => {
+    this.authService.registerUser(formvalue.value).subscribe({
+      next: (response) => {
         this.authService.logout();
         this.snackbarService.showSnackbar(
           'User Created! Please login',
@@ -67,9 +66,10 @@ export class SignupComponent implements OnInit {
         updateProfile(this.auth.currentUser, {
           displayName: formvalue.value.name,
         }).catch((err) => console.log(err));
-      })
-      .catch((error) => {
+      },
+      error: (error) => {
         this.snackbarService.showSnackbar(error.message, null, 3000);
-      });
+      },
+    });
   }
 }

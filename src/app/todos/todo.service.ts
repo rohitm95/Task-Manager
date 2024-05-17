@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Todo } from './todo.model';
-import { Subject, from } from 'rxjs';
+import { asyncScheduler, scheduled } from 'rxjs';
 import {
   Firestore,
   addDoc,
@@ -19,7 +19,6 @@ import { SpinnerService } from '../shared/spinner.service';
 
 @Injectable({ providedIn: 'root' })
 export class TodoService {
-  private availableTasks: Todo[] = [];
   docRef;
   private userId;
   spinnerService = inject(SpinnerService);
@@ -34,85 +33,29 @@ export class TodoService {
       collection(this.fireStore, 'availableTasks'),
       where('userId', '==', userId)
     );
-
-    const userTasksCollection = from(getDocs(userTasksQuery));
-
-    userTasksCollection.subscribe({
-      next: (querySnapshot) => {
-        let docs = querySnapshot.docs;
-        this.availableTasks = docs.map((doc) => {
-          return {
-            id: doc.id,
-            title: doc.data()['title'],
-            description: doc.data()['description'],
-            status: doc.data()['status'],
-            date: doc.data()['date'],
-          };
-        });
-        this.broadcast.broadcast('availableTasks', {
-          tasks: this.availableTasks,
-        });
-        this.spinnerService.showSpinner.next(false);
-      },
-      error: (error) => {
-        console.error('Error fetching user tasks: ', error);
-      },
-    });
+    return scheduled(getDocs(userTasksQuery), asyncScheduler);
   }
 
   // fetchAvailableTasks() {
-  //   const availableTasksCollection = from(
-  //     getDocs(collection(this.fireStore, 'availableTasks'))
+  //   const availableTasksCollection = scheduled(
+  //     getDocs(collection(this.fireStore, 'availableTasks'), asyncScheduler)
   //   );
-  //   availableTasksCollection.subscribe({
-  //     next: (querySnapshot) => {
-  //       let docs = querySnapshot.docs;
-  //       this.availableTasks = docs.map((doc) => {
-  //         return {
-  //           id: doc.id,
-  //           title: doc.data()['title'],
-  //           description: doc.data()['description'],
-  //           status: doc.data()['status'],
-  //           date: doc.data()['date'],
-  //         };
-  //       });
-  //       this.broadcast.broadcast('availableTasks', {
-  //         tasks: this.availableTasks,
-  //       });
-  //       this.spinnerService.showSpinner.next(false);
-  //     },
-  //     error: (error) => {
-  //       this.snackbarService.showSnackbar(
-  //         'Fetching tasks failed, please try again later',
-  //         null,
-  //         3000
-  //       );
-  //       this.broadcast.broadcast('availableTasks', { tasks: null });
-  //     },
-  //   });
+  // return availableTasksCollection
   // }
 
-  async addTaskToDatabase(task: Todo) {
+  addTaskToDatabase(task: Todo) {
     let newTask = {
       ...task,
       date: new Date().toISOString(),
       userId: this.userId,
     };
-    await addDoc(collection(this.fireStore, 'availableTasks'), newTask)
-      .then((response) => {
-        this.fetchUserTasks(this.userId);
-        this.snackbarService.showSnackbar('Task Created!', null, 3000);
-      })
-      .catch((error) => {
-        this.snackbarService.showSnackbar(
-          'Oops, some error occurred. Please try again!',
-          null,
-          3000
-        );
-      });
+    return scheduled(
+      addDoc(collection(this.fireStore, 'availableTasks'), newTask),
+      asyncScheduler
+    );
   }
 
-  async updateTask(task) {
+  updateTask(task) {
     this.docRef = doc(this.fireStore, 'availableTasks', task.id);
 
     const data = {
@@ -121,64 +64,17 @@ export class TodoService {
       status: task.taskData.status,
     };
 
-    await updateDoc(this.docRef, data)
-      .then((response) => {
-        this.fetchUserTasks(this.userId);
-        this.broadcast.broadcast('updateTask', { status: 'success' });
-        this.snackbarService.showSnackbar('Task Updated!', null, 3000);
-        this.spinnerService.showSpinner.next(false);
-      })
-      .catch((error) => {
-        this.snackbarService.showSnackbar(
-          'Oops, some error occurred. Please try again!',
-          null,
-          3000
-        );
-      });
+    return scheduled(updateDoc(this.docRef, data), asyncScheduler);
   }
 
-  async deleteTask(id) {
+  deleteTask(id) {
     this.docRef = doc(this.fireStore, 'availableTasks', id);
-
-    await deleteDoc(this.docRef)
-      .then((response) => {
-        this.fetchUserTasks(this.userId);
-        this.broadcast.broadcast('deleteTask', { status: 'success' });
-        this.spinnerService.showSpinner.next(false);
-        this.snackbarService.showSnackbar(
-          'Task deleted SUccessfully!',
-          null,
-          3000
-        );
-      })
-      .catch((error) => {
-        this.snackbarService.showSnackbar(
-          'Oops, some error occurred. Please try again!',
-          null,
-          3000
-        );
-      });
+    return scheduled(deleteDoc(this.docRef), asyncScheduler);
   }
 
-  async getTask(id) {
+  getTask(id) {
     this.docRef = doc(this.fireStore, 'availableTasks', id);
-    try {
-      const docSnap = await getDoc(this.docRef);
-      if (docSnap.exists()) {
-        this.broadcast.broadcast('taskDetail', { data: docSnap.data() });
-        this.spinnerService.showSpinner.next(false);
-      } else {
-        console.log('Document does not exist');
-      }
-    } catch (error) {
-      console.error('Error getting document:', error);
-      this.snackbarService.showSnackbar(
-        'Error getting document, try again',
-        null,
-        3000
-      );
-      this.broadcast.broadcast('taskDetail', { data: null });
-      this.spinnerService.showSpinner.next(false);
-    }
+
+    return scheduled(getDoc(this.docRef), asyncScheduler);
   }
 }

@@ -62,28 +62,33 @@ export class LoginComponent implements OnInit {
 
   login(formData: FormGroup) {
     this.spinnerService.showSpinner.next(true);
-    this.authService.login({
-      email: formData.value.email,
-      password: formData.value.password,
-    }).then((result) => {
-      this.spinnerService.showSpinner.next(false);
-      this.router.navigate(['/todo-list']);
-    })
-    .catch((error) => {
-      if (
-        error.message === 'Firebase: Error (auth/invalid-login-credentials).'
-      ) {
-        this.spinnerService.showSpinner.next(false);
-        this.snackbarService.showSnackbar(
-          'Invalid login credentials',
-          null,
-          3000
-        );
-      } else {
-        this.spinnerService.showSpinner.next(false);
-        this.snackbarService.showSnackbar(error.message, null, 3000);
-      }
-    });
+    this.authService
+      .login({
+        email: formData.value.email,
+        password: formData.value.password,
+      })
+      .subscribe({
+        next: (response) => {
+          this.spinnerService.showSpinner.next(false);
+          this.router.navigate(['/todo-list']);
+        },
+        error: (error) => {
+          if (
+            error.message ===
+            'Firebase: Error (auth/invalid-login-credentials).'
+          ) {
+            this.spinnerService.showSpinner.next(false);
+            this.snackbarService.showSnackbar(
+              'Invalid login credentials',
+              null,
+              3000
+            );
+          } else {
+            this.spinnerService.showSpinner.next(false);
+            this.snackbarService.showSnackbar(error.message, null, 3000);
+          }
+        },
+      });
   }
 
   navigateToSignUp() {

@@ -12,6 +12,7 @@ import {
 } from '../list/list.component';
 import { Subscription } from 'rxjs';
 import { SpinnerService } from '../../shared/spinner.service';
+import { SnackbarService } from '../../shared/snackbar.service';
 
 @Component({
   selector: 'app-task-detail',
@@ -31,6 +32,7 @@ export class TaskDetailComponent implements OnInit, OnDestroy {
   broadcast = inject(BroadcasterService);
   dialog = inject(MatDialog);
   route = inject(ActivatedRoute);
+  snackbarService = inject(SnackbarService);
 
   constructor() {}
 
@@ -66,7 +68,30 @@ export class TaskDetailComponent implements OnInit, OnDestroy {
 
   getTaskData() {
     this.spinnerService.showSpinner.next(true);
-    this.todoService.getTask(this.taskId);
+    this.todoService.getTask(this.taskId).subscribe({
+      next: (response) => {
+        if (response.exists()) {
+          this.broadcast.broadcast('taskDetail', { data: response.data() });
+          this.spinnerService.showSpinner.next(false);
+        } else {
+          this.snackbarService.showSnackbar(
+            'Document does not exist',
+            null,
+            3000
+          );
+          this.spinnerService.showSpinner.next(false);
+        }
+      },
+      error: (error) => {
+        console.error('Error getting document:', error);
+        this.snackbarService.showSnackbar(
+          'Error getting document, try again',
+          null,
+          3000
+        );
+        this.spinnerService.showSpinner.next(false);
+      },
+    });
   }
 
   editTask() {
@@ -79,7 +104,23 @@ export class TaskDetailComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(DialogDeleteTaskComponent);
     dialogRef.afterClosed().subscribe((response) => {
       this.spinnerService.showSpinner.next(true);
-      this.todoService.deleteTask(this.taskId);
+      this.todoService.deleteTask(this.taskId).subscribe({
+        next: (response) => {
+          this.router.navigate(['/todo-list']);
+          this.snackbarService.showSnackbar(
+            'Task deleted Successfully!',
+            null,
+            3000
+          );
+        },
+        error: (error) => {
+          this.snackbarService.showSnackbar(
+            'Oops, some error occurred. Please try again!',
+            null,
+            3000
+          );
+        },
+      });
     });
   }
 

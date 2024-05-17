@@ -1,7 +1,6 @@
 import {
   AfterViewInit,
   Component,
-  Inject,
   OnDestroy,
   OnInit,
   ViewChild,
@@ -38,6 +37,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Auth, authState } from '@angular/fire/auth';
 import { SpinnerService } from '../../shared/spinner.service';
+import { SnackbarService } from '../../shared/snackbar.service';
 
 @Component({
   selector: 'app-list',
@@ -71,6 +71,7 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
   broadcast = inject(BroadcasterService);
   router = inject(Router);
   authState$ = authState(this.auth);
+  snackbarService = inject(SnackbarService);
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -78,9 +79,8 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
   constructor() {}
 
   ngOnInit(): void {
-    this.broadcast.recieve('availableTasks', (response) => {
-      this.dataSource.data = response.tasks;
-      this.data = response.tasks;
+    this.broadcast.recieve('reloadList', () => {
+      this.getTaskList();
     });
 
     this.subscription = this.spinnerService.showSpinner.subscribe(
@@ -88,15 +88,41 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
         this.isLoadingResults = response;
       }
     );
+  }
 
+  getTaskList() {
     this.authState$.subscribe((user) => {
       if (user) {
-        this.todoService.fetchUserTasks(user.uid);
+        this.todoService.fetchUserTasks(user.uid).subscribe({
+          next: (querySnapshot) => {
+            let docs = querySnapshot.docs;
+            const availableTasks = docs.map((doc) => {
+              return {
+                id: doc.id,
+                title: doc.data()['title'],
+                description: doc.data()['description'],
+                status: doc.data()['status'],
+                date: doc.data()['date'],
+              };
+            });
+            this.dataSource.data = availableTasks;
+            this.data = availableTasks;
+            this.spinnerService.showSpinner.next(false);
+          },
+          error: (error) => {
+            this.snackbarService.showSnackbar(
+              'Error fetching user tasks: ',
+              null,
+              3000
+            );
+          },
+        });
       }
     });
   }
 
   ngAfterViewInit(): void {
+    this.getTaskList();
     this.dataSource.sort = this.sort;
   }
 
@@ -109,7 +135,25 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((response) => {
       this.spinnerService.showSpinner.next(true);
-      this.todoService.deleteTask(id);
+      this.todoService.deleteTask(id).subscribe({
+        next: (response) => {
+          this.broadcast.broadcast('reloadList', {});
+          this.broadcast.broadcast('deleteTask', { status: 'success' });
+          this.spinnerService.showSpinner.next(false);
+          this.snackbarService.showSnackbar(
+            'Task deleted SUccessfully!',
+            null,
+            3000
+          );
+        },
+        error: (error) => {
+          this.snackbarService.showSnackbar(
+            'Oops, some error occurred. Please try again!',
+            null,
+            3000
+          );
+        },
+      });
     });
   }
 
@@ -172,6 +216,8 @@ export class DialogAddTaskComponent implements OnInit {
   fb = inject(FormBuilder);
   dialogRef = inject(MatDialogRef<DialogAddTaskComponent>);
   data = inject(MAT_DIALOG_DATA);
+  snackbarService = inject(SnackbarService);
+  broadcast = inject(BroadcasterService);
 
   constructor() {}
 
@@ -197,7 +243,19 @@ export class DialogAddTaskComponent implements OnInit {
 
   createTask() {
     this.spinnerService.showSpinner.next(true);
-    this.todoService.addTaskToDatabase(this.toDoForm.value);
+    this.todoService.addTaskToDatabase(this.toDoForm.value).subscribe({
+      next: (response) => {
+        this.broadcast.broadcast('reloadList', {});
+        this.snackbarService.showSnackbar('Task Created!', null, 3000);
+      },
+      error: (error) => {
+        this.snackbarService.showSnackbar(
+          'Oops, some error occurred. Please try again!',
+          null,
+          3000
+        );
+      },
+    });
   }
 
   onNoClick() {
@@ -212,7 +270,21 @@ export class DialogAddTaskComponent implements OnInit {
       taskData: this.toDoForm.value,
     };
     this.toDoForm.reset();
-    this.todoService.updateTask(payload);
+    this.todoService.updateTask(payload).subscribe({
+      next: (response) => {
+        this.broadcast.broadcast('reloadList', {});
+        this.broadcast.broadcast('updateTask', { status: 'success' });
+        this.snackbarService.showSnackbar('Task Updated!', null, 3000);
+        this.spinnerService.showSpinner.next(false);
+      },
+      error: (error) => {
+        this.snackbarService.showSnackbar(
+          'Oops, some error occurred. Please try again!',
+          null,
+          3000
+        );
+      },
+    });
   }
 }
 

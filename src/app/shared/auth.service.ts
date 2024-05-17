@@ -4,39 +4,42 @@ import {
   authState,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut,
-  updateProfile,
+  signOut
 } from '@angular/fire/auth';
 import { SnackbarService } from './snackbar.service';
 import { AuthData } from './auth-data.model';
 import { Router } from '@angular/router';
 import { SpinnerService } from './spinner.service';
+import { asyncScheduler, scheduled } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private spinnerService = inject(SpinnerService) 
   private auth: Auth = inject(Auth);
-  snackbarService =  inject(SnackbarService);
-  router = inject(Router)
+  snackbarService = inject(SnackbarService);
+  router = inject(Router);
   isAuthenticated = false;
   authState$ = authState(this.auth);
   user;
   constructor() {}
 
-  registerUser = async (authData: AuthData) => {
-    
-      return createUserWithEmailAndPassword(
+  registerUser(authData: AuthData) {
+    return scheduled(
+      createUserWithEmailAndPassword(
         this.auth,
         authData.email,
         authData.password
-      )
-        
-  };
+      ),
+      asyncScheduler
+    );
+  }
 
   login(authData: AuthData) {
-    return signInWithEmailAndPassword(this.auth, authData.email, authData.password)
+    return scheduled(
+      signInWithEmailAndPassword(this.auth, authData.email, authData.password),
+      asyncScheduler
+    );
   }
 
   initAuthListener() {
