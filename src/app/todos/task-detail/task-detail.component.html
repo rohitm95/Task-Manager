@@ -1,34 +1,25 @@
 @if (isLoadingResults) {
-<div class="example-loading-shade">
-    @if (isLoadingResults) {
-    <mat-spinner></mat-spinner>
-    }
-</div>
+    <div class="example-loading-shade">
+        @if (isLoadingResults) {
+            <mat-spinner></mat-spinner>
+        }
+    </div>
 }
-<section class="flex-row justify-center task-details">
-    <mat-card class="container container-xs" [class.mat-elevation-z8]="true">
-        <mat-card-title class="justify-center flex-row">Task Details</mat-card-title>
-        <mat-card-content class="justify-center flex-column">
-            <p><strong>Title:</strong> {{taskDetails.title}}</p>
-            <p><strong>Description:</strong> {{taskDetails.description}}</p>
-            <p><strong>Status:</strong> {{taskDetails.status}}</p>
-        </mat-card-content>
-        <mat-card-actions class="flex-row space-even">
-            <button mat-raised-button color="primary" (click)="editTask()">Edit Task</button>
-            <button mat-raised-button color="warn" (click)="deleteTask()">Delete Task</button>
-            <button mat-raised-button color="accent" (click)="goBack()">Back</button>
-        </mat-card-actions>
-    </mat-card>
-</section>
-<!-- <div class="container">
-    <mat-card appearance="outlined">
-        <mat-card-header>Task Details</mat-card-header>
-        <mat-card-content>
-            
-        </mat-card-content>
-        <mat-card-actions>
-            
-        </mat-card-actions>
-    </mat-card>
-    <button mat-raised-button color="accent" class="back-button" (click)="goBack()">Back</button>
-</div> -->
+
+@if (taskDetails) {
+    <section class="flex-row justify-center task-details">
+        <mat-card class="container container-xs" [class.mat-elevation-z8]="true">
+            <mat-card-title class="justify-center flex-row">Task Details</mat-card-title>
+            <mat-card-content class="justify-center flex-column">
+                <p><strong>Title:</strong> {{taskDetails.title}}</p>
+                <p><strong>Description:</strong> {{taskDetails.description}}</p>
+                <p><strong>Status:</strong> {{taskDetails.status}}</p>
+            </mat-card-content>
+            <mat-card-actions class="flex-row space-even">
+                <button mat-raised-button color="primary" (click)="editTask()">Edit Task</button>
+                <button mat-raised-button color="warn" (click)="deleteTask()">Delete Task</button>
+                <button mat-raised-button color="accent" (click)="goBack()">Back</button>
+            </mat-card-actions>
+        </mat-card>
+    </section>
+}

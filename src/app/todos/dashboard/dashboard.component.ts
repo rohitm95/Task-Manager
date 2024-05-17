@@ -31,10 +31,11 @@ export class DashboardComponent implements OnInit {
   panelOpenState = false;
   user;
   displayName = '';
-  private auth: Auth = inject(Auth);
+  auth = inject(Auth);
+  authService = inject(AuthService);
   authState$ = authState(this.auth);
 
-  constructor(private authService: AuthService) {}
+  constructor() {}
 
   ngOnInit(): void {
     this.authState$.subscribe((user) => {

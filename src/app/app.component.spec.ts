@@ -14,9 +14,9 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'task-manager' title`, () => {
+  it(`should have the 'Task Manager' title`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('task-manager');
+    expect(app.title).toEqual('Task Manager');
   });
 });

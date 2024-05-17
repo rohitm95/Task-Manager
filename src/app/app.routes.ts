@@ -16,7 +16,7 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'todo-list', pathMatch: 'full' },
       { path: 'todo-list', component: ListComponent },
-      { path: 'todo', component: TaskDetailComponent },
+      { path: 'todo/:id', component: TaskDetailComponent },
     ],
     canActivate: [authGuard]
   },

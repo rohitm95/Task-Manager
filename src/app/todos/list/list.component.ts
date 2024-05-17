@@ -64,19 +64,18 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
   data: Todo[] = [];
   isLoadingResults = true;
   subscription: Subscription;
-  private spinnerService = inject(SpinnerService);
-  private auth: Auth = inject(Auth);
+  spinnerService = inject(SpinnerService);
+  auth = inject(Auth);
+  dialog = inject(MatDialog);
+  todoService = inject(TodoService);
+  broadcast = inject(BroadcasterService);
+  router = inject(Router);
   authState$ = authState(this.auth);
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(
-    public dialog: MatDialog,
-    public todoService: TodoService,
-    private broadcast: BroadcasterService,
-    private router: Router
-  ) {}
+  constructor() {}
 
   ngOnInit(): void {
     this.broadcast.recieve('availableTasks', (response) => {
@@ -102,7 +101,7 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   viewTask(id) {
-    this.router.navigateByUrl('/todo', { state: { key: id } });
+    this.router.navigate(['/todo', id]);
   }
 
   deleteTask(id) {
@@ -168,14 +167,13 @@ export class DialogAddTaskComponent implements OnInit {
   ];
   editMode;
   taskId;
-  todoService = inject(TodoService)
-  spinnerService = inject(SpinnerService)
+  todoService = inject(TodoService);
+  spinnerService = inject(SpinnerService);
+  fb = inject(FormBuilder);
+  dialogRef = inject(MatDialogRef<DialogAddTaskComponent>);
+  data = inject(MAT_DIALOG_DATA);
 
-  constructor(
-    private fb: FormBuilder,
-    public dialogRef: MatDialogRef<DialogAddTaskComponent>,
-    @Inject(MAT_DIALOG_DATA) public data
-  ) {}
+  constructor() {}
 
   ngOnInit() {
     this.toDoForm = this.fb.group({
@@ -225,5 +223,6 @@ export class DialogAddTaskComponent implements OnInit {
   standalone: true,
 })
 export class DialogDeleteTaskComponent {
-  constructor(public dialogRef: MatDialogRef<DialogDeleteTaskComponent>) {}
+  dialogRef = inject(MatDialogRef<DialogDeleteTaskComponent>);
+  constructor() {}
 }

@@ -14,6 +14,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subscription } from 'rxjs';
 import { SpinnerService } from '../shared/spinner.service';
+import { SnackbarService } from '../shared/snackbar.service';
 
 @Component({
   selector: 'app-login',
@@ -34,10 +35,11 @@ export class LoginComponent implements OnInit {
   hide = true;
   isLoadingResults = false;
   authService = inject(AuthService);
-  private fb = inject(FormBuilder);
-  private router = inject(Router);
+  fb = inject(FormBuilder);
+  router = inject(Router);
   spinnerService = inject(SpinnerService);
   subscription: Subscription;
+  snackbarService = inject(SnackbarService);
 
   constructor() {}
 
@@ -63,6 +65,24 @@ export class LoginComponent implements OnInit {
     this.authService.login({
       email: formData.value.email,
       password: formData.value.password,
+    }).then((result) => {
+      this.spinnerService.showSpinner.next(false);
+      this.router.navigate(['/todo-list']);
+    })
+    .catch((error) => {
+      if (
+        error.message === 'Firebase: Error (auth/invalid-login-credentials).'
+      ) {
+        this.spinnerService.showSpinner.next(false);
+        this.snackbarService.showSnackbar(
+          'Invalid login credentials',
+          null,
+          3000
+        );
+      } else {
+        this.spinnerService.showSpinner.next(false);
+        this.snackbarService.showSnackbar(error.message, null, 3000);
+      }
     });
   }
 

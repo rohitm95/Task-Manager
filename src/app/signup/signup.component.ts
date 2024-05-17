@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -11,6 +11,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { Router } from '@angular/router';
 import { AuthService } from '../shared/auth.service';
+import { SnackbarService } from '../shared/snackbar.service';
+import { Auth, updateProfile } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-signup',
@@ -28,8 +30,13 @@ import { AuthService } from '../shared/auth.service';
 export class SignupComponent implements OnInit {
   userSignupForm: FormGroup;
   hide = true;
+  router = inject(Router);
+  fb = inject(FormBuilder);
+  authService = inject(AuthService);
+  snackbarService = inject(SnackbarService);
+  auth = inject(Auth);
 
-  constructor(private router: Router, private fb: FormBuilder, private authService: AuthService) {}
+  constructor() {}
 
   ngOnInit(): void {
     this.userSignupForm = this.fb.group({
@@ -48,6 +55,21 @@ export class SignupComponent implements OnInit {
   }
 
   signup(formvalue: FormGroup) {
-    this.authService.registerUser(formvalue.value)
+    this.authService
+      .registerUser(formvalue.value)
+      .then((result) => {
+        this.authService.logout();
+        this.snackbarService.showSnackbar(
+          'User Created! Please login',
+          null,
+          3000
+        );
+        updateProfile(this.auth.currentUser, {
+          displayName: formvalue.value.name,
+        }).catch((err) => console.log(err));
+      })
+      .catch((error) => {
+        this.snackbarService.showSnackbar(error.message, null, 3000);
+      });
   }
 }

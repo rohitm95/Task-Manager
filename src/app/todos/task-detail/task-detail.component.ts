@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TodoService } from '../todo.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,29 +24,40 @@ export class TaskDetailComponent implements OnInit, OnDestroy {
   taskId = '';
   taskDetails;
   isLoadingResults = true;
-  spinnerService = inject(SpinnerService);
   subscription: Subscription;
-  constructor(
-    public router: Router,
-    private todoService: TodoService,
-    private broadcast: BroadcasterService,
-    public dialog: MatDialog
-  ) {}
+  spinnerService = inject(SpinnerService);
+  router = inject(Router);
+  todoService = inject(TodoService);
+  broadcast = inject(BroadcasterService);
+  dialog = inject(MatDialog);
+  route = inject(ActivatedRoute);
+
+  constructor() {}
+
   ngOnInit(): void {
-    this.taskId = window.history.state.key;
+    this.route.params.subscribe((params) => {
+      this.taskId = params['id'];
+    });
+
     this.getTaskData();
+
     this.broadcast.recieve('taskDetail', (response) => {
       this.taskDetails = response.data;
     });
+
     this.broadcast.recieve('updateTask', () => {
       this.getTaskData();
     });
+
     this.broadcast.recieve('deleteTask', () => {
       this.router.navigate(['/todo-list']);
     });
-    this.subscription = this.spinnerService.showSpinner.subscribe((response) => {
-      this.isLoadingResults = response;
-    });
+
+    this.subscription = this.spinnerService.showSpinner.subscribe(
+      (response) => {
+        this.isLoadingResults = response;
+      }
+    );
   }
 
   goBack() {
@@ -54,6 +65,7 @@ export class TaskDetailComponent implements OnInit, OnDestroy {
   }
 
   getTaskData() {
+    this.spinnerService.showSpinner.next(true);
     this.todoService.getTask(this.taskId);
   }
 

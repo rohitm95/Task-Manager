@@ -21,13 +21,12 @@ import { SpinnerService } from '../shared/spinner.service';
 export class TodoService {
   private availableTasks: Todo[] = [];
   docRef;
-  private spinnerService = inject(SpinnerService);
   private userId;
-  constructor(
-    private snackbarService: SnackbarService,
-    private broadcast: BroadcasterService,
-    public fireStore: Firestore
-  ) {}
+  spinnerService = inject(SpinnerService);
+  snackbarService = inject(SnackbarService);
+  broadcast = inject(BroadcasterService);
+  fireStore = inject(Firestore);
+  constructor() {}
 
   fetchUserTasks(userId: string) {
     this.userId = userId;
