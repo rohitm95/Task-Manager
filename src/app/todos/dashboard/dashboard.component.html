@@ -1,23 +1,34 @@
-<mat-sidenav-container class="app-sidenav-container">
-  <mat-sidenav #sidenav mode="side" class="app-sidenav" [opened]="opened">
-    <mat-toolbar class="logo-toolbar">
-      <img
-        src="https://firebasestorage.googleapis.com/v0/b/to-do-app-3569d.appspot.com/o/default-profile-pic.png?alt=media&token=09a77c81-9576-438c-8c35-a74119a26103"
-        class="menu-img"
-        alt="default profile"
-      />
-    </mat-toolbar>
-    <h3 class="margin-l-10">Welcome! @if(user) { {{ displayName }} }</h3>
-    <mat-nav-list>
-      <mat-list-item class="link">Profile</mat-list-item>
-      <mat-list-item (click)="logOut()"> Logout </mat-list-item>
-    </mat-nav-list>
-  </mat-sidenav>
-
-  <mat-sidenav-content class="sidenav-content">
-    <app-header (sidenav)="sidenav.toggle()"></app-header>
-    <div class="sidenav-container">
-      <router-outlet></router-outlet>
+<div>
+  @if (isLoadingResults) {
+    <div class="example-loading-shade">
+      <mat-spinner></mat-spinner>
     </div>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  }
+  <mat-sidenav-container class="app-sidenav-container">
+    <mat-sidenav #sidenav mode="side" class="app-sidenav" [opened]="opened">
+      @if (!isLoadingResults) {
+        <mat-toolbar class="logo-toolbar">
+          <img
+            src="https://firebasestorage.googleapis.com/v0/b/to-do-app-3569d.appspot.com/o/default-profile-pic.png?alt=media&token=09a77c81-9576-438c-8c35-a74119a26103"
+            class="menu-img"
+            alt="default profile"
+          />
+        </mat-toolbar>
+        <h3 class="margin-l-10">Welcome! @if(user) { {{ displayName }} }</h3>
+        <mat-nav-list>
+          <mat-list-item class="link">Profile</mat-list-item>
+          <mat-list-item (click)="logOut()"> Logout </mat-list-item>
+        </mat-nav-list>
+      }
+    </mat-sidenav>
+
+    <mat-sidenav-content class="sidenav-content">
+      @if (!isLoadingResults) {
+        <app-header (sidenav)="sidenav.toggle()"></app-header>
+      }
+      <div class="sidenav-container">
+        <router-outlet></router-outlet>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

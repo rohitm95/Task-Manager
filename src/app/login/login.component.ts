@@ -71,6 +71,7 @@ export class LoginComponent implements OnInit {
         next: (response) => {
           this.spinnerService.showSpinner.next(false);
           this.router.navigate(['/todo-list']);
+          this.authService.createSession(JSON.stringify(response.user))
         },
         error: (error) => {
           if (

@@ -1,16 +1,16 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import {
   Auth,
   authState,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut
+  signOut,
 } from '@angular/fire/auth';
 import { SnackbarService } from './snackbar.service';
 import { AuthData } from './auth-data.model';
 import { Router } from '@angular/router';
-import { SpinnerService } from './spinner.service';
 import { asyncScheduler, scheduled } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root',
@@ -22,6 +22,8 @@ export class AuthService {
   isAuthenticated = false;
   authState$ = authState(this.auth);
   user;
+  private platformId: Object = inject(PLATFORM_ID);
+
   constructor() {}
 
   registerUser(authData: AuthData) {
@@ -51,7 +53,26 @@ export class AuthService {
     });
   }
 
+  createSession(user: string) {
+    if (isPlatformBrowser(this.platformId)) {
+      sessionStorage.setItem('user', user);
+    }
+  }
+
+  isUserLoggedIn() {
+    if (isPlatformBrowser(this.platformId)) {
+      return !!sessionStorage.getItem('user');
+    } else {
+      return false;
+    }
+  }
+
   logout() {
+    if (isPlatformBrowser(this.platformId)) {
+      if (sessionStorage.getItem('user')) {
+        sessionStorage.removeItem('user');
+      }
+    }
     signOut(this.auth);
     this.router.navigate(['/login']);
   }

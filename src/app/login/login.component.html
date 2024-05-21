@@ -1,8 +1,6 @@
 @if (isLoadingResults) {
     <div class="example-loading-shade">
-        @if (isLoadingResults) {
-            <mat-spinner></mat-spinner>
-        }
+      <mat-spinner></mat-spinner>
     </div>
 }
 <section class="login-form">
@@ -20,7 +18,7 @@
         <mat-icon>mail_outline</mat-icon>
       </button>
       @if(controls['email'].invalid && controls['email'].touched){
-      <mat-error>Email required or invalid.</mat-error>
+        <mat-error>Email required or invalid.</mat-error>
       }
     </mat-form-field>
 
@@ -45,7 +43,7 @@
         <mat-icon>{{ hide ? "visibility_off" : "visibility" }}</mat-icon>
       </button>
       @if(controls['password'].invalid && controls['password'].touched) {
-      <mat-error>Password required or invalid.</mat-error>
+        <mat-error>Password required or invalid.</mat-error>
       }
     </mat-form-field>
 

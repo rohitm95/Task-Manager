@@ -13,6 +13,9 @@ import { Router } from '@angular/router';
 import { AuthService } from '../shared/auth.service';
 import { SnackbarService } from '../shared/snackbar.service';
 import { Auth, updateProfile } from '@angular/fire/auth';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Subscription } from 'rxjs';
+import { SpinnerService } from '../shared/spinner.service';
 
 @Component({
   selector: 'app-signup',
@@ -23,6 +26,7 @@ import { Auth, updateProfile } from '@angular/fire/auth';
     MatButtonModule,
     MatIconModule,
     ReactiveFormsModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss',
@@ -35,6 +39,9 @@ export class SignupComponent implements OnInit {
   authService = inject(AuthService);
   snackbarService = inject(SnackbarService);
   auth = inject(Auth);
+  isLoadingResults = false;
+  subscription: Subscription;
+  spinnerService = inject(SpinnerService);
 
   constructor() {}
 
@@ -44,6 +51,12 @@ export class SignupComponent implements OnInit {
       password: ['', [Validators.required]],
       name: ['', [Validators.required]],
     });
+
+    this.subscription = this.spinnerService.showSpinner.subscribe(
+      (response) => {
+        this.isLoadingResults = response;
+      }
+    );
   }
 
   get controls() {
@@ -55,6 +68,7 @@ export class SignupComponent implements OnInit {
   }
 
   signup(formvalue: FormGroup) {
+    this.spinnerService.showSpinner.next(true);
     this.authService.registerUser(formvalue.value).subscribe({
       next: (response) => {
         this.authService.logout();

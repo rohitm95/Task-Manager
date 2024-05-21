@@ -4,7 +4,6 @@ import { TodoService } from '../todo.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { BroadcasterService } from '../../shared/broadcaster.service';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import {
   DialogAddTaskComponent,
@@ -17,7 +16,7 @@ import { SnackbarService } from '../../shared/snackbar.service';
 @Component({
   selector: 'app-task-detail',
   standalone: true,
-  imports: [RouterModule, MatCardModule, MatButtonModule, MatProgressSpinner],
+  imports: [RouterModule, MatCardModule, MatButtonModule],
   templateUrl: './task-detail.component.html',
   styleUrl: './task-detail.component.scss',
 })

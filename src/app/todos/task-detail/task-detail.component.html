@@ -1,11 +1,3 @@
-@if (isLoadingResults) {
-    <div class="example-loading-shade">
-        @if (isLoadingResults) {
-            <mat-spinner></mat-spinner>
-        }
-    </div>
-}
-
 @if (taskDetails) {
     <section class="flex-row justify-center task-details">
         <mat-card class="container container-xs" [class.mat-elevation-z8]="true">
