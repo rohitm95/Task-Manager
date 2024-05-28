@@ -12,11 +12,12 @@ import {
 import { Subscription } from 'rxjs';
 import { SpinnerService } from '../../shared/spinner.service';
 import { SnackbarService } from '../../shared/snackbar.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-task-detail',
   standalone: true,
-  imports: [RouterModule, MatCardModule, MatButtonModule],
+  imports: [RouterModule, MatCardModule, MatButtonModule, MatProgressSpinnerModule],
   templateUrl: './task-detail.component.html',
   styleUrl: './task-detail.component.scss',
 })

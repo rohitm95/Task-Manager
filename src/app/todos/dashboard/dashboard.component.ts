@@ -1,6 +1,4 @@
 import {
-  AfterViewChecked,
-  ChangeDetectorRef,
   Component,
   OnInit,
   inject,
@@ -15,9 +13,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../../shared/auth.service';
 import { Auth, authState } from '@angular/fire/auth';
-import { Subscription } from 'rxjs';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { SpinnerService } from '../../shared/spinner.service';
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
@@ -31,12 +28,12 @@ import { SpinnerService } from '../../shared/spinner.service';
     MatIconModule,
     MatMenuModule,
     HeaderComponent,
-    MatProgressSpinnerModule,
+    NgOptimizedImage
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent implements OnInit, AfterViewChecked {
+export class DashboardComponent implements OnInit {
   opened = true;
   panelOpenState = false;
   user;
@@ -44,32 +41,18 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   auth = inject(Auth);
   authService = inject(AuthService);
   authState$ = authState(this.auth);
-  subscription: Subscription;
   isLoadingResults = true;
   spinnerService = inject(SpinnerService);
-  cdRef = inject(ChangeDetectorRef);
 
   constructor() {}
 
   ngOnInit(): void {
-    this.subscription = this.authState$.subscribe((user) => {
+    this.authState$.subscribe((user) => {
       this.user = user;
-      this.displayName = this.user.displayName;
     });
-
-    this.subscription = this.spinnerService.showSpinner.subscribe(
-      (response) => {
-        this.isLoadingResults = response;
-      }
-    );
-  }
-
-  ngAfterViewChecked(): void {
-    this.cdRef.detectChanges();
   }
 
   logOut() {
     this.authService.logout();
   }
-
 }

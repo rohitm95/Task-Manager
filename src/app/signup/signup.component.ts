@@ -79,6 +79,7 @@ export class SignupComponent implements OnInit {
         );
         updateProfile(this.auth.currentUser, {
           displayName: formvalue.value.name,
+          photoURL: 'https://firebase.googleapis.com/v0/b/to-do-app-3569d.appspot.com/o/default-profile-pic.png?alt=media&token=09a77c81-9576-438c-8c35-a74119a26103',
         }).catch((err) => console.log(err));
       },
       error: (error) => {

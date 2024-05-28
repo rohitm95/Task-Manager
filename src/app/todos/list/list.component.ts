@@ -131,29 +131,34 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   deleteTask(id) {
-    const dialogRef = this.dialog.open(DialogDeleteTaskComponent);
+    let result = this.data.find((task) => task.id == id);
+    const dialogRef = this.dialog.open(DialogDeleteTaskComponent, {
+      data: result,
+    });
 
     dialogRef.afterClosed().subscribe((response) => {
-      this.spinnerService.showSpinner.next(true);
-      this.todoService.deleteTask(id).subscribe({
-        next: (response) => {
-          this.broadcast.broadcast('reloadList', {});
-          this.broadcast.broadcast('deleteTask', { status: 'success' });
-          this.spinnerService.showSpinner.next(false);
-          this.snackbarService.showSnackbar(
-            'Task deleted SUccessfully!',
-            null,
-            3000
-          );
-        },
-        error: (error) => {
-          this.snackbarService.showSnackbar(
-            'Oops, some error occurred. Please try again!',
-            null,
-            3000
-          );
-        },
-      });
+      if (response) {
+        this.spinnerService.showSpinner.next(true);
+        this.todoService.deleteTask(id).subscribe({
+          next: (response) => {
+            this.broadcast.broadcast('reloadList', {});
+            this.broadcast.broadcast('deleteTask', { status: 'success' });
+            this.spinnerService.showSpinner.next(false);
+            this.snackbarService.showSnackbar(
+              'Task deleted SUccessfully!',
+              null,
+              3000
+            );
+          },
+          error: (error) => {
+            this.snackbarService.showSnackbar(
+              'Oops, some error occurred. Please try again!',
+              null,
+              3000
+            );
+          },
+        });
+      }
     });
   }
 
@@ -296,5 +301,6 @@ export class DialogAddTaskComponent implements OnInit {
 })
 export class DialogDeleteTaskComponent {
   dialogRef = inject(MatDialogRef<DialogDeleteTaskComponent>);
+  data = inject(MAT_DIALOG_DATA);
   constructor() {}
 }

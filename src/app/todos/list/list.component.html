@@ -1,11 +1,16 @@
-@if (!isLoadingResults) {
-    <div class="title-container">
-        <span>Tasks</span>
-        <span class="spacer"></span>
-        <button mat-raised-button color="primary" (click)="addNewTask()">
-            Add New Task
-        </button>
+<div class="title-container">
+    <span>Tasks</span>
+    <span class="spacer"></span>
+    <button mat-raised-button color="primary" (click)="addNewTask()">
+        Add New Task
+    </button>
+</div>
+
+@if (isLoadingResults) {
+    <div class="loading-shade">
+        <mat-spinner></mat-spinner>
     </div>
+} @else {
     @if (data.length) {
         <div class="table-container">
             <mat-form-field>

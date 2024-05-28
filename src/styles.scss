@@ -1,4 +1,3 @@
-
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
 @use '@angular/material' as mat;
@@ -21,14 +20,15 @@ $task-manager-warn: mat.define-palette(mat.$red-palette);
 // Create the theme object. A theme consists of configurations for individual
 // theming systems such as "color" or "typography".
 $task-manager-theme: mat.define-light-theme((
-  color: (
-    primary: $task-manager-primary,
-    accent: $task-manager-accent,
-    warn: $task-manager-warn,
-  ),
-  typography: mat.define-typography-config(),
-  density: 0
-));
+    color: (
+      primary: $task-manager-primary,
+      accent: $task-manager-accent,
+      warn: $task-manager-warn,
+    ),
+    typography: mat.define-typography-config(),
+    density: 0,
+  )
+);
 
 // Include theme styles for core and each component used in your app.
 // Alternatively, you can import and @include the theme mixins for each component
@@ -37,45 +37,123 @@ $task-manager-theme: mat.define-light-theme((
 
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
 
 // Flex row/col + grid.
 // <div fxLayout="row"> → <div class="flex-row">
-.flex-row { display: flex!important; flex-direction: row; }
-.flex-col { display: flex!important; flex-direction: column; }
-.grid { display: grid; }
+.flex-row {
+  display: flex !important;
+  flex-direction: row;
+}
+.flex-col {
+  display: flex !important;
+  flex-direction: column;
+}
+.grid {
+  display: grid;
+}
 
 // Flex-wrap utils.
-.flex-wrap { flex-wrap: wrap; }  // Mostly used with flex-row, when wrapping is desired.
-.flex-col-xs { @media screen and (max-width: 599px) { flex-direction: column; } }  // Switch from flex-row to flex-col on mobile.
+.flex-wrap {
+  flex-wrap: wrap;
+} // Mostly used with flex-row, when wrapping is desired.
+.flex-col-xs {
+  @media screen and (max-width: 599px) {
+    flex-direction: column;
+  }
+} // Switch from flex-row to flex-col on mobile.
 
 // Gap.
 // <div fxLayoutGap="8px"> → <div class="gap-8">
-.gap-4 { gap: 4px; }
-.gap-8 { gap: 8px; }
-.gap-10 { gap: 10px; }
-.gap-12 { gap: 12px; }
-.gap-16 { gap: 16px; }
+.gap-4 {
+  gap: 4px;
+}
+.gap-8 {
+  gap: 8px;
+}
+.gap-10 {
+  gap: 10px;
+}
+.gap-12 {
+  gap: 12px;
+}
+.gap-16 {
+  gap: 16px;
+}
 
 // Justify content.
 // <div fxLayoutAlign="justify-between center"> → <div class="space-between items-center">
-.space-between { justify-content: space-between; }  // Used very often with flex-row.
-.space-around { justify-content: space-around; }
-.space-even { justify-content: space-evenly; }
-.justify-center { justify-content: center; }  // Used to center something via flexbox.
+.space-between {
+  justify-content: space-between;
+} // Used very often with flex-row.
+.space-around {
+  justify-content: space-around;
+}
+.space-even {
+  justify-content: space-evenly;
+}
+.justify-center {
+  justify-content: center;
+} // Used to center something via flexbox.
 
 // Align items. (Naming inspiration: https://tailwindcss.com/docs/align-items.)
-.items-center { align-items: center; }  // Used very often with flex-row.
+.items-center {
+  align-items: center;
+} // Used very often with flex-row.
+
+.items-self-center {
+  align-self: center;
+} // Used to center something via flexbox
 
 // Flex/grow/shrink properties https://developer.mozilla.org/en-US/docs/Web/CSS/flex.
 // <div fxFlex> → <div class="flex-1">
-.flex-1 { flex: 1 }  // Same as flex: 1 1 0 (grow, shrink, basis 0). Has similar effect to width: 100%;
-.flex-grow { flex-grow: 1; }  // Same as flex: 1 1 auto (grow, shrink, basis auto). For spacer, etc. 
+.flex-1 {
+  flex: 1;
+} // Same as flex: 1 1 0 (grow, shrink, basis 0). Has similar effect to width: 100%;
+.flex-grow {
+  flex-grow: 1;
+} // Same as flex: 1 1 auto (grow, shrink, basis auto). For spacer, etc.
 
 // Hide & show for different breakpoints.
 // <div fxHide.xs> → <div class="hide-xs">
-.hide-xs    { @media screen and (max-width: 599px) { display: none; } }  // Hide on mobile.
-.hide-gt-xs { @media screen and (min-width: 600px) { display: none; } }  // Show only on mobile. Hide on desktop.
-.hide-sm    { @media screen and (max-width: 959px) { display: none; } }  // Hide on mobile/tablet.
-.hide-gt-sm { @media screen and (min-width: 960px) { display: none; } }  // Show only on mobile/tablet. Hide on desktop.
+.hide-xs {
+  @media screen and (max-width: 599px) {
+    display: none;
+  }
+} // Hide on mobile.
+.hide-gt-xs {
+  @media screen and (min-width: 600px) {
+    display: none;
+  }
+} // Show only on mobile. Hide on desktop.
+.hide-sm {
+  @media screen and (max-width: 959px) {
+    display: none;
+  }
+} // Hide on mobile/tablet.
+.hide-gt-sm {
+  @media screen and (min-width: 960px) {
+    display: none;
+  }
+} // Show only on mobile/tablet. Hide on desktop.
+
+.loading-shade {
+  position: absolute;
+  height: 100%;
+  top: 0;
+  left: 0;
+  bottom: 56px;
+  right: 0;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

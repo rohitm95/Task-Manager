@@ -1,8 +1,10 @@
 <h2 mat-dialog-title>Delete the task</h2>
 <mat-dialog-content>
-  <p>Are you sure?</p>
+  <p>
+    Are you sure to delete task <strong>{{ data.title }}</strong>?
+  </p>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close cdkFocusInitial>Cancel</button>
-  <button mat-button [mat-dialog-close]="true">Proceed</button>
+  <button mat-button [mat-dialog-close]="false" cdkFocusInitial>No</button>
+  <button mat-button [mat-dialog-close]="true">Yes</button>
 </mat-dialog-actions>

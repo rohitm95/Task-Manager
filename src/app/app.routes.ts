@@ -6,6 +6,7 @@ import { DashboardComponent } from './todos/dashboard/dashboard.component';
 import { ListComponent } from './todos/list/list.component';
 import { TaskDetailComponent } from './todos/task-detail/task-detail.component';
 import { authGuard } from './shared/auth.guard';
+import { ProfileComponent } from './todos/profile/profile.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -17,6 +18,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'todo-list', pathMatch: 'full' },
       { path: 'todo-list', component: ListComponent },
       { path: 'todo/:id', component: TaskDetailComponent },
+      { path: 'profile', component: ProfileComponent }
     ],
     canActivate: [authGuard]
   },

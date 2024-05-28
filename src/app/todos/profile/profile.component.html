@@ -1,0 +1,44 @@
+@if (isLoadingResults) {
+    <div class="loading-shade">
+        <mat-spinner></mat-spinner>
+    </div>
+} @else {
+    <div class="title-container">
+        <span class="spacer"></span>
+        <button mat-raised-button color="primary">Edit Profile</button>
+    </div>
+    <section class="flex-row justify-center">
+        <mat-card class="container container-xs" [class.mat-elevation-z8]="true">
+            <mat-card-header class="justify-center flex-row">
+                <mat-card-title>Profile Details</mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="justify-center flex-col">
+                <img
+                    [ngSrc]="userDetails.photoURL"
+                    id="profile-img"
+                    class="profile-img items-self-center"
+                    alt="selected img"
+                    width="150"
+                    height="150"
+                    priority
+                 />
+                <div class="items-self-center" (click)="uploadFile.click()">
+                    <button mat-raised-button color="primary">Choose File</button>
+                    <input 
+                    #uploadFile 
+                    (change)="uploadSelectedFile($event)"
+                    type="file"
+                    style="display: none;"
+                    />
+                </div>
+                <p><strong>Name:</strong> {{ userDetails.displayName }}</p>
+                <p><strong>Email:</strong> {{ userDetails.email }}</p>
+                <p><strong>Phone:</strong> {{ userDetails.phoneNumber }}</p>
+            </mat-card-content>
+            <mat-card-actions>
+                <button mat-raised-button color="primary">Save</button>
+                <button mat-raised-button color="warn">Cancel</button>
+            </mat-card-actions>
+        </mat-card>
+    </section>
+}
