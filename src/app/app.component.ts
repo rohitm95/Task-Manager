@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, PLATFORM_ID, inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +12,10 @@ import { RouterOutlet } from '@angular/router';
 })
 export class AppComponent {
   title = 'Task Manager';
+  private platformId = inject(PLATFORM_ID);
+  static isBrowser = new BehaviorSubject<boolean>(null);
 
-  constructor() {}
+  constructor() {
+    AppComponent.isBrowser.next(isPlatformBrowser(this.platformId))
+  }
 }

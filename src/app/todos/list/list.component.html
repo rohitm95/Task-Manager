@@ -1,31 +1,50 @@
 <div class="title-container">
-    <span>Tasks</span>
-    <span class="spacer"></span>
-    <button mat-raised-button color="primary" (click)="addNewTask()">
-        Add New Task
-    </button>
+  <span>Tasks</span>
+  <span class="spacer"></span>
+  <button mat-raised-button color="primary" (click)="addNewTask()">
+    Add New Task
+  </button>
 </div>
 
 @if (isLoadingResults) {
     <div class="loading-shade">
         <mat-spinner></mat-spinner>
     </div>
-} @else {
+} @else { 
     @if (data.length) {
         <div class="table-container">
             <mat-form-field>
-                <input matInput (keyup)="applyFilter($event)" placeholder="Search by title, status.." #input>
+                <input
+                matInput
+                (keyup)="applyFilter($event)"
+                placeholder="Search by title, status.."
+                #input
+                />
             </mat-form-field>
             <mat-card appearance="outlined">
-                <table mat-table [dataSource]="dataSource" matSortActive="status" matSortDisableClear matSortDirection="asc"
-                matSort>
+                <table
+                mat-table
+                [dataSource]="dataSource"
+                matSortActive="status"
+                matSortDisableClear
+                matSortDirection="asc"
+                matSort
+                >
                     <ng-container matColumnDef="title">
                         <th mat-header-cell *matHeaderCellDef>Title</th>
                         <td mat-cell *matCellDef="let row">{{ row.title }}</td>
                     </ng-container>
 
                     <ng-container matColumnDef="status">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by status" matTooltip="Sort tasks by status">Status</th>
+                        <th
+                        mat-header-cell
+                        *matHeaderCellDef
+                        mat-sort-header
+                        sortActionDescription="Sort by status"
+                        matTooltip="Sort tasks by status"
+                        >
+                        Status
+                        </th>
                         <td mat-cell *matCellDef="let row">{{ row.status }}</td>
                     </ng-container>
 
@@ -37,15 +56,19 @@
                     <ng-container matColumnDef="actions">
                         <th mat-header-cell *matHeaderCellDef class="action-header">Actions</th>
                         <td mat-cell *matCellDef="let row">
-                            <button mat-button matTooltip="View Task" (click)="viewTask(row.id)">
-                                <mat-icon>visibility</mat-icon>
-                            </button>
-                            <button mat-button matTooltip="Edit Task" (click)="editTask(row.id)">
-                                <mat-icon>edit</mat-icon>
-                            </button>
-                                <button mat-button matTooltip="Delete Task" (click)="deleteTask(row.id)">
-                                <mat-icon>delete</mat-icon>
-                            </button>
+                        <button mat-button matTooltip="View Task" (click)="viewTask(row.id)">
+                            <mat-icon>visibility</mat-icon>
+                        </button>
+                        <button mat-button matTooltip="Edit Task" (click)="editTask(row.id)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button
+                            mat-button
+                            matTooltip="Delete Task"
+                            (click)="deleteTask(row.id)"
+                        >
+                            <mat-icon>delete</mat-icon>
+                        </button>
                         </td>
                     </ng-container>
 
@@ -61,5 +84,5 @@
         </div>
     } @else {
         <h2>No Records Found!</h2>
-    }
+    } 
 }
