@@ -151,6 +151,7 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
             );
           },
           error: (error) => {
+            this.spinnerService.showSpinner.next(false);
             this.snackbarService.showSnackbar(
               'Oops, some error occurred. Please try again!',
               null,

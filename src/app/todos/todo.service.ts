@@ -15,13 +15,11 @@ import {
 } from '@angular/fire/firestore';
 import { SnackbarService } from '../shared/snackbar.service';
 import { BroadcasterService } from '../shared/broadcaster.service';
-import { SpinnerService } from '../shared/spinner.service';
 
 @Injectable({ providedIn: 'root' })
 export class TodoService {
   docRef;
   private userId;
-  spinnerService = inject(SpinnerService);
   snackbarService = inject(SnackbarService);
   broadcast = inject(BroadcasterService);
   fireStore = inject(Firestore);

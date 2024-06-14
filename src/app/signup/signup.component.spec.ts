@@ -1,25 +1,29 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SignupComponent } from './signup.component';
 import { Router } from '@angular/router';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../shared/auth.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Auth } from '@angular/fire/auth';
 
 describe('SignupComponent', () => {
   let component: SignupComponent;
   let fixture: ComponentFixture<SignupComponent>;
   let routerSpy: jasmine.SpyObj<Router>;
   let authServiceSpy: jasmine.SpyObj<AuthService>;
+  let authSpy: jasmine.SpyObj<Auth>;
 
   beforeEach(async () => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     authServiceSpy = jasmine.createSpyObj('AuthService', ['registerUser']);
+    authSpy = jasmine.createSpyObj('Auth', ['signOut']);
 
     await TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, SignupComponent, BrowserAnimationsModule],
       providers: [
         { provide: Router, useValue: routerSpy },
         { provide: AuthService, useValue: authServiceSpy },
+        { provide: Auth, useValue: authSpy },
       ],
     }).compileComponents();
   });

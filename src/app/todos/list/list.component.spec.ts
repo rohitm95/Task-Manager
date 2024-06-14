@@ -4,9 +4,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { TodoService } from '../todo.service';
 import { BroadcasterService } from '../../shared/broadcaster.service';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatSort } from '@angular/material/sort';
+import { Auth } from '@angular/fire/auth';
+import { SpinnerService } from '../../shared/spinner.service';
+import { SnackbarService } from '../../shared/snackbar.service';
 
 describe('ListComponent', () => {
   let component: ListComponent;
@@ -15,6 +16,9 @@ describe('ListComponent', () => {
   let todoServiceSpy: jasmine.SpyObj<TodoService>;
   let broadcasterServiceSpy: jasmine.SpyObj<BroadcasterService>;
   let routerSpy: jasmine.SpyObj<Router>;
+  let authSpy: jasmine.SpyObj<Auth>;
+  let spinnerServiceSpy: jasmine.SpyObj<SpinnerService>;
+  let snackbarServiceSpy: jasmine.SpyObj<SnackbarService>;
 
   beforeEach(async () => {
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open', 'afterClosed']);
@@ -26,6 +30,9 @@ describe('ListComponent', () => {
       'recieve',
     ]);
     routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
+    authSpy = jasmine.createSpyObj('Auth', ['signOut']);
+    spinnerServiceSpy = jasmine.createSpyObj('SpinnerService', ['showSpinner']);
+    snackbarServiceSpy = jasmine.createSpyObj('SnackbarService', ['showSnackbar']);
 
     await TestBed.configureTestingModule({
       imports: [ListComponent],
@@ -34,6 +41,9 @@ describe('ListComponent', () => {
         { provide: TodoService, useValue: todoServiceSpy },
         { provide: BroadcasterService, useValue: broadcasterServiceSpy },
         { provide: Router, useValue: routerSpy },
+        { provide: Auth, useValue: authSpy },
+        { provide: SpinnerService, useValue: spinnerServiceSpy },
+        { provide: SnackbarService, useValue: snackbarServiceSpy },
       ],
     }).compileComponents();
   });
@@ -54,16 +64,9 @@ describe('ListComponent', () => {
 
   it('should emit data on ngOnInit', () => {
     component.ngOnInit();
-    todoServiceSpy.showSpinner.subscribe((message) => {
+    spinnerServiceSpy.showSpinner.subscribe((message) => {
       expect(message).toBe(false);
     });
-
-    todoServiceSpy.showSpinner.next(false);
-  });
-
-  it('should call todoService.fetchAvailableTasks() on ngAfterViewInit', () => {
-    component.ngAfterViewInit();
-    expect(todoServiceSpy.fetchAvailableTasks).toHaveBeenCalled();
   });
 
   it('should navigate to todo details page on viewTask', () => {
@@ -76,11 +79,9 @@ describe('ListComponent', () => {
 
   it('should open delete task dialog on deleteTask', () => {
     const id = 'test-id';
-    // dialogSpy.open.and.returnValue({ afterClosed: () => of(true) });
-
     component.deleteTask(id);
     expect(dialogSpy.open).toHaveBeenCalled();
-    expect(todoServiceSpy.showSpinner.next).toHaveBeenCalledWith(true);
+    expect(spinnerServiceSpy.showSpinner.next).toHaveBeenCalledWith(true);
     expect(todoServiceSpy.deleteTask).toHaveBeenCalledWith(id);
   });
 

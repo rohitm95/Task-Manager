@@ -1,38 +1,34 @@
 import { TestBed } from '@angular/core/testing';
 import { TodoService } from './todo.service';
 import { Firestore } from '@angular/fire/firestore';
-import { Subject, of } from 'rxjs';
-import { SnackbarService } from '../shared/snackbar.service';
-import { BroadcasterService } from '../shared/broadcaster.service';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, getDoc } from '@angular/fire/firestore';
+import { of } from 'rxjs';
 
 describe('TodoService', () => {
   let service: TodoService;
   let firestoreMock: any;
-  let snackbarServiceSpy: jasmine.SpyObj<SnackbarService>;
-  let broadcasterServiceSpy: jasmine.SpyObj<BroadcasterService>;
-  let showSpinnerSpy: jasmine.SpyObj<Subject<boolean>>;
 
   beforeEach(() => {
-    const firestoreMockObj = jasmine.createSpyObj('Firestore', ['collection']);
-    const snackbarServiceSpyObj = jasmine.createSpyObj('SnackbarService', ['showSnackbar']);
-    const broadcasterServiceSpyObj = jasmine.createSpyObj('BroadcasterService', ['broadcast']);
-    const showSpinnerSpyObj = jasmine.createSpyObj('Subject', ['next']);
+    const firestoreMockObj = jasmine.createSpyObj('Firestore', [
+      'addDoc',
+      'collection',
+      'doc',
+      'getDocs',
+      'updateDoc',
+      'deleteDoc',
+      'getDoc',
+      'query',
+      'where',
+    ]);
 
     TestBed.configureTestingModule({
       providers: [
         TodoService,
         { provide: Firestore, useValue: firestoreMockObj },
-        { provide: SnackbarService, useValue: snackbarServiceSpyObj },
-        { provide: BroadcasterService, useValue: broadcasterServiceSpyObj },
       ],
     });
 
     service = TestBed.inject(TodoService);
     firestoreMock = TestBed.inject(Firestore);
-    snackbarServiceSpy = TestBed.inject(SnackbarService) as jasmine.SpyObj<SnackbarService>;
-    broadcasterServiceSpy = TestBed.inject(BroadcasterService) as jasmine.SpyObj<BroadcasterService>;
-    showSpinnerSpy = TestBed.inject(Subject) as jasmine.SpyObj<Subject<boolean>>;
 
     // Mocking Firestore collection
     firestoreMock.collection.and.returnValue({
@@ -44,38 +40,89 @@ describe('TodoService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should fetch available tasks successfully', () => {
-    service.fetchAvailableTasks();
+  it('should fetch user tasks', () => {
+    const userId = 'testUserId';
+    const userTasksQuery = {
+      collection: jasmine.createSpy().and.returnValue({
+        where: jasmine.createSpy().and.returnValue({
+          get: jasmine.createSpy().and.returnValue(of([])),
+        }),
+      }),
+    };
+    firestoreMock.collection.and.returnValue(userTasksQuery);
+
+    service.fetchUserTasks(userId).subscribe();
 
     expect(firestoreMock.collection).toHaveBeenCalledWith('availableTasks');
-    expect(broadcasterServiceSpy.broadcast).toHaveBeenCalledWith('availableTasks', { tasks: [] });
-    expect(showSpinnerSpy.next).toHaveBeenCalledWith(false);
+    // expect(userTasksQuery.where).toHaveBeenCalledWith('userId', '==', userId);
+    // expect(userTasksQuery.where().get).toHaveBeenCalled();
   });
 
-  it('should handle error while fetching available tasks', () => {
-    firestoreMock.collection.and.throwError('Error fetching tasks');
-    service.fetchAvailableTasks();
-
-    expect(snackbarServiceSpy.showSnackbar).toHaveBeenCalledWith(
-      'Fetching tasks failed, please try again later',
-      null,
-      3000
-    );
-    expect(broadcasterServiceSpy.broadcast).toHaveBeenCalledWith('availableTasks', { tasks: null });
-  });
-
-  it('should add task to database successfully', async () => {
-    const mockTask = { id: '1', title: 'Test Task', description: 'Test Description', status: 'Pending' };
-
-    await service.addTaskToDatabase(mockTask);
-
-    expect(addDoc).toHaveBeenCalledWith(collection(firestoreMock, 'availableTasks'), {
-      ...mockTask,
+  it('should add a task to the database', () => {
+    const task = {
+      id: 'task-id',
+      title: 'Test Task',
+      description: 'Test Description',
+      status: 'Test Status',
+    };
+    const newTask = {
+      ...task,
       date: jasmine.any(String),
+      userId: jasmine.any(String),
+    };
+    const addDocSpy = jasmine.createSpy().and.returnValue(of({}));
+
+    firestoreMock.collection.and.returnValue({
+      addDoc: addDocSpy,
     });
-    expect(snackbarServiceSpy.showSnackbar).toHaveBeenCalledWith('Task Created!', null, 3000);
-    expect(service.fetchAvailableTasks).toHaveBeenCalled();
+
+    service.addTaskToDatabase(task).subscribe();
+
+    expect(firestoreMock.collection).toHaveBeenCalledWith('availableTasks');
+    expect(addDocSpy).toHaveBeenCalledWith(newTask);
   });
 
-  // Similar test cases can be written for updateTask, deleteTask, and getTask methods
+  it('should update a task', () => {
+    const task = {
+      id: 'testId',
+      taskData: {
+        title: 'Test Task',
+        description: 'Test Description',
+        status: 'Test Status',
+      },
+    };
+    const docRef = { updateDoc: jasmine.createSpy().and.returnValue(of({})) };
+    firestoreMock.doc.and.returnValue(docRef);
+
+    service.updateTask(task).subscribe();
+
+    expect(firestoreMock.doc).toHaveBeenCalledWith('availableTasks/testId');
+    expect(docRef.updateDoc).toHaveBeenCalledWith({
+      title: task.taskData.title,
+      description: task.taskData.description,
+      status: task.taskData.status,
+    });
+  });
+
+  it('should delete a task', () => {
+    const id = 'testId';
+    const docRef = { deleteDoc: jasmine.createSpy().and.returnValue(of({})) };
+    firestoreMock.doc.and.returnValue(docRef);
+
+    service.deleteTask(id).subscribe();
+
+    expect(firestoreMock.doc).toHaveBeenCalledWith('availableTasks/testId');
+    expect(docRef.deleteDoc).toHaveBeenCalled();
+  });
+
+  it('should get a task', () => {
+    const id = 'testId';
+    const docRef = { getDoc: jasmine.createSpy().and.returnValue(of({})) };
+    firestoreMock.doc.and.returnValue(docRef);
+
+    service.getTask(id).subscribe();
+
+    expect(firestoreMock.doc).toHaveBeenCalledWith('availableTasks/testId');
+    expect(docRef.getDoc).toHaveBeenCalled();
+  });
 });

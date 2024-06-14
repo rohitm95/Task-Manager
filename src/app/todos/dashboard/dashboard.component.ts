@@ -13,7 +13,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../../shared/auth.service';
 import { Auth, authState } from '@angular/fire/auth';
-import { SpinnerService } from '../../shared/spinner.service';
 import { NgOptimizedImage } from '@angular/common';
 
 @Component({
@@ -41,8 +40,6 @@ export class DashboardComponent implements OnInit {
   auth = inject(Auth);
   authService = inject(AuthService);
   authState$ = authState(this.auth);
-  isLoadingResults = true;
-  spinnerService = inject(SpinnerService);
 
   constructor() {}
 

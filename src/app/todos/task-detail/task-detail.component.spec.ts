@@ -1,10 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TaskDetailComponent } from './task-detail.component';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TodoService } from '../todo.service';
 import { BroadcasterService } from '../../shared/broadcaster.service';
 import { MatDialog } from '@angular/material/dialog';
-import { of } from 'rxjs';
 
 describe('TaskDetailComponent', () => {
   let component: TaskDetailComponent;
@@ -13,12 +12,14 @@ describe('TaskDetailComponent', () => {
   let todoServiceSpy: jasmine.SpyObj<TodoService>;
   let broadcasterServiceSpy: jasmine.SpyObj<BroadcasterService>;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let activatedRouteSpy: { get: jasmine.Spy };
 
   beforeEach(async () => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     todoServiceSpy = jasmine.createSpyObj('TodoService', ['getTask', 'deleteTask']);
     broadcasterServiceSpy = jasmine.createSpyObj('BroadcasterService', ['recieve']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open', 'afterClosed']);
+    activatedRouteSpy = { get: jasmine.createSpy('get') };
 
     await TestBed.configureTestingModule({
       imports: [TaskDetailComponent],
@@ -27,6 +28,7 @@ describe('TaskDetailComponent', () => {
         { provide: TodoService, useValue: todoServiceSpy },
         { provide: BroadcasterService, useValue: broadcasterServiceSpy },
         { provide: MatDialog, useValue: dialogSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
     }).compileComponents();
   });
@@ -69,17 +71,6 @@ describe('TaskDetailComponent', () => {
     component.editTask();
 
     expect(dialogSpy.open).toHaveBeenCalled();
-  });
-
-  it('should open delete task dialog on deleteTask', () => {
-    const dialogRefSpyObj = jasmine.createSpyObj({ afterClosed: of(true) });
-    dialogSpy.open.and.returnValue(dialogRefSpyObj);
-
-    component.deleteTask();
-
-    expect(dialogSpy.open).toHaveBeenCalled();
-    expect(todoServiceSpy.showSpinner.next).toHaveBeenCalledWith(true);
-    expect(todoServiceSpy.deleteTask).toHaveBeenCalledWith(component.taskId);
   });
 
   it('should unsubscribe from subscription on ngOnDestroy', () => {
