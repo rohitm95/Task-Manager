@@ -9,6 +9,9 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 3. Open the application in the browser.
 4. Login with the credentials. If you don't have an account create using the sign-up button.
 
+## Deployment on Firebase
+URL: https://firebase.google.com/docs/hosting/frameworks/angular
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
