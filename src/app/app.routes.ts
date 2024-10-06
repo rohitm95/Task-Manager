@@ -1,26 +1,45 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './login/login.component';
 import { NotFoundComponent } from './not-found/not-found.component';
-import { SignupComponent } from './signup/signup.component';
 import { DashboardComponent } from './todos/dashboard/dashboard.component';
-import { ListComponent } from './todos/list/list.component';
-import { TaskDetailComponent } from './todos/task-detail/task-detail.component';
 import { authGuard } from './shared/auth.guard';
-import { ProfileComponent } from './todos/profile/profile.component';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
-  { path: 'signup', component: SignupComponent },
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./login/login.component').then((c) => c.LoginComponent),
+  },
+  {
+    path: 'signup',
+    loadComponent: () =>
+      import('./signup/signup.component').then((c) => c.SignupComponent),
+  },
   {
     path: '',
     component: DashboardComponent,
     children: [
       { path: '', redirectTo: 'todo-list', pathMatch: 'full' },
-      { path: 'todo-list', component: ListComponent },
-      { path: 'todo/:id', component: TaskDetailComponent },
-      { path: 'profile', component: ProfileComponent }
+      {
+        path: 'todo-list',
+        loadComponent: () =>
+          import('./todos/list/list.component').then((c) => c.ListComponent),
+      },
+      {
+        path: 'todo/:id',
+        loadComponent: () =>
+          import('./todos/task-detail/task-detail.component').then(
+            (c) => c.TaskDetailComponent
+          ),
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./todos/profile/profile.component').then(
+            (c) => c.ProfileComponent
+          ),
+      },
     ],
-    canActivate: [authGuard]
+    canActivate: [authGuard],
   },
   { path: '**', component: NotFoundComponent },
 ];

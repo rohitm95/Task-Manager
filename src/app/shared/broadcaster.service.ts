@@ -5,7 +5,7 @@ import { Subject, filter, map } from 'rxjs';
   providedIn: 'root',
 })
 export class BroadcasterService {
-  private _handler: Subject<Subjects> = new Subject<Subjects>();
+  readonly _handler: Subject<Subjects> = new Subject<Subjects>();
   constructor() {}
 
   broadcast(name, args) {
