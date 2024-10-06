@@ -1,5 +1,5 @@
 <mat-sidenav-container class="app-sidenav-container">
-  <mat-sidenav #sidenav mode="side" class="app-sidenav" [opened]="opened">
+  <mat-sidenav #sidenav mode="over" class="app-sidenav" [opened]="!opened">
     <mat-toolbar class="logo-toolbar justify-center">
       @if (user) {
           <img

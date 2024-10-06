@@ -16,7 +16,7 @@ import { LocalStorageService } from './localstorage.service';
   providedIn: 'root',
 })
 export class AuthService {
-  private auth: Auth = inject(Auth);
+  readonly auth: Auth = inject(Auth);
   snackbarService = inject(SnackbarService);
   router = inject(Router);
   isAuthenticated = false;
@@ -45,7 +45,7 @@ export class AuthService {
   }
 
   logout() {
-    this.localstorageService.clear();
+    this.localstorageService.removeItem('user');
     signOut(this.auth);
     this.router.navigate(['/login']);
   }
