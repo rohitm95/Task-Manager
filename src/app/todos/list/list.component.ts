@@ -37,6 +37,7 @@ import { Router, RouterModule } from '@angular/router';
 import { Auth, authState } from '@angular/fire/auth';
 import { SpinnerService } from '../../shared/spinner.service';
 import { SnackbarService } from '../../shared/snackbar.service';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-list',
@@ -53,13 +54,14 @@ import { SnackbarService } from '../../shared/snackbar.service';
     MatProgressSpinnerModule,
     RouterModule,
     DatePipe,
+    MatPaginatorModule,
   ],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
 })
 export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
   displayedColumns: string[] = ['title', 'status', 'created', 'actions'];
-  dataSource = new MatTableDataSource();
+  dataSource;
   data: Todo[] = [];
   isLoadingResults = true;
   subscription: Subscription;
@@ -71,8 +73,9 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
   router = inject(Router);
   authState$ = authState(this.auth);
   snackbarService = inject(SnackbarService);
-
+  
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor() {}
 
@@ -86,6 +89,7 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
         this.isLoadingResults = response;
       }
     );
+    this.getTaskList();
   }
 
   getTaskList() {
@@ -103,7 +107,9 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
                 date: doc.data()['date'],
               };
             });
-            this.dataSource.data = availableTasks;
+            this.dataSource = new MatTableDataSource<Todo>(availableTasks);
+            this.dataSource.sort = this.sort;
+            this.dataSource.paginator = this.paginator;
             this.data = availableTasks;
             this.spinnerService.showSpinner.next(false);
           },
@@ -122,6 +128,7 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
   ngAfterViewInit(): void {
     this.getTaskList();
     this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
   }
 
   viewTask(id) {
