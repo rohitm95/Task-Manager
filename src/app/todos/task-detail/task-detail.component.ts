@@ -17,7 +17,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 @Component({
   selector: 'app-task-detail',
   standalone: true,
-  imports: [RouterModule, MatCardModule, MatButtonModule, MatProgressSpinnerModule],
+  imports: [
+    RouterModule,
+    MatCardModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+  ],
   templateUrl: './task-detail.component.html',
   styleUrl: './task-detail.component.scss',
 })
@@ -101,26 +106,30 @@ export class TaskDetailComponent implements OnInit, OnDestroy {
   }
 
   deleteTask() {
-    const dialogRef = this.dialog.open(DialogDeleteTaskComponent);
+    const dialogRef = this.dialog.open(DialogDeleteTaskComponent, {
+      data: this.taskDetails,
+    });
     dialogRef.afterClosed().subscribe((response) => {
-      this.spinnerService.showSpinner.next(true);
-      this.todoService.deleteTask(this.taskId).subscribe({
-        next: (response) => {
-          this.router.navigate(['/todo-list']);
-          this.snackbarService.showSnackbar(
-            'Task deleted Successfully!',
-            null,
-            3000
-          );
-        },
-        error: (error) => {
-          this.snackbarService.showSnackbar(
-            'Oops, some error occurred. Please try again!',
-            null,
-            3000
-          );
-        },
-      });
+      if (response) {
+        this.spinnerService.showSpinner.next(true);
+        this.todoService.deleteTask(this.taskId).subscribe({
+          next: (response) => {
+            this.router.navigate(['/todo-list']);
+            this.snackbarService.showSnackbar(
+              'Task deleted Successfully!',
+              null,
+              3000
+            );
+          },
+          error: (error) => {
+            this.snackbarService.showSnackbar(
+              'Oops, some error occurred. Please try again!',
+              null,
+              3000
+            );
+          },
+        });
+      }
     });
   }
 
