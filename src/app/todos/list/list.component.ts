@@ -9,25 +9,12 @@ import {
 import { MatCardModule } from '@angular/material/card';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import {
-  MAT_DIALOG_DATA,
-  MatDialog,
-  MatDialogModule,
-  MatDialogRef,
-} from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
 import { TodoService } from '../todo.service';
 import { Subscription } from 'rxjs';
 import { Todo } from '../todo.model';
@@ -38,6 +25,8 @@ import { Auth, authState } from '@angular/fire/auth';
 import { SpinnerService } from '../../shared/spinner.service';
 import { SnackbarService } from '../../shared/snackbar.service';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { AddTaskComponent } from '../add-task/add-task.component';
+import { DeleteTaskComponent } from '../delete-task/delete-task.component';
 
 @Component({
   selector: 'app-list',
@@ -73,7 +62,7 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
   router = inject(Router);
   authState$ = authState(this.auth);
   snackbarService = inject(SnackbarService);
-  
+
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -137,7 +126,7 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
 
   deleteTask(id) {
     let result = this.data.find((task) => task.id == id);
-    const dialogRef = this.dialog.open(DialogDeleteTaskComponent, {
+    const dialogRef = this.dialog.open(DeleteTaskComponent, {
       data: result,
     });
 
@@ -170,13 +159,13 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
 
   editTask(id) {
     let result = this.data.find((task) => task.id == id);
-    this.dialog.open(DialogAddTaskComponent, {
+    this.dialog.open(AddTaskComponent, {
       data: { result: result, editMode: true },
     });
   }
 
   addNewTask() {
-    this.dialog.open(DialogAddTaskComponent, {
+    this.dialog.open(AddTaskComponent, {
       data: { editMode: false },
     });
   }
@@ -189,124 +178,4 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
-}
-
-@Component({
-  selector: 'dialog-add-task',
-  templateUrl: './dialog-add-task.component.html',
-  styles: [
-    `
-      form {
-        display: flex;
-        flex-direction: column;
-      }
-    `,
-  ],
-  standalone: true,
-  imports: [
-    MatInputModule,
-    MatFormFieldModule,
-    MatCardModule,
-    MatSelectModule,
-    MatDialogModule,
-    MatButtonModule,
-    ReactiveFormsModule,
-  ],
-})
-export class DialogAddTaskComponent implements OnInit {
-  toDoForm: FormGroup;
-  statusList = [
-    { value: 'To Do', viewValue: 'To Do' },
-    { value: 'In Progress', viewValue: 'In Progress' },
-    { value: 'Done', viewValue: 'Done' },
-  ];
-  editMode;
-  taskId;
-  todoService = inject(TodoService);
-  spinnerService = inject(SpinnerService);
-  fb = inject(FormBuilder);
-  dialogRef = inject(MatDialogRef<DialogAddTaskComponent>);
-  data = inject(MAT_DIALOG_DATA);
-  snackbarService = inject(SnackbarService);
-  broadcast = inject(BroadcasterService);
-
-  constructor() {}
-
-  ngOnInit() {
-    this.toDoForm = this.fb.group({
-      title: ['', [Validators.required]],
-      description: ['', [Validators.required]],
-      status: ['', [Validators.required]],
-    });
-    if (this.data.editMode) {
-      this.toDoForm.patchValue({
-        title: this.data.result.title,
-        description: this.data.result.description,
-        status: this.data.result.status,
-      });
-      if (this.data.result.id) {
-        this.taskId = this.data.result.id;
-      } else {
-        this.taskId = this.data.id;
-      }
-    }
-  }
-
-  createTask() {
-    this.spinnerService.showSpinner.next(true);
-    this.todoService.addTaskToDatabase(this.toDoForm.value).subscribe({
-      next: (response) => {
-        this.broadcast.broadcast('reloadList', {});
-        this.snackbarService.showSnackbar('Task Created!', null, 3000);
-      },
-      error: (error) => {
-        this.snackbarService.showSnackbar(
-          'Oops, some error occurred. Please try again!',
-          null,
-          3000
-        );
-      },
-    });
-  }
-
-  onNoClick() {
-    this.dialogRef.close();
-    this.toDoForm.reset();
-  }
-
-  updateTask() {
-    this.spinnerService.showSpinner.next(true);
-    const payload = {
-      id: this.taskId,
-      taskData: this.toDoForm.value,
-    };
-    this.toDoForm.reset();
-    this.todoService.updateTask(payload).subscribe({
-      next: (response) => {
-        this.broadcast.broadcast('reloadList', {});
-        this.broadcast.broadcast('updateTask', { status: 'success' });
-        this.snackbarService.showSnackbar('Task Updated!', null, 3000);
-        this.spinnerService.showSpinner.next(false);
-      },
-      error: (error) => {
-        this.snackbarService.showSnackbar(
-          'Oops, some error occurred. Please try again!',
-          null,
-          3000
-        );
-      },
-    });
-  }
-}
-
-@Component({
-  selector: 'dialog-delete-task',
-  templateUrl: './dialog-delete-task.component.html',
-  imports: [MatDialogModule, MatButtonModule],
-  standalone: true,
-})
-export class DialogDeleteTaskComponent {
-  dialogRef = inject(MatDialogRef<DialogDeleteTaskComponent>);
-  data = inject(MAT_DIALOG_DATA);
-  constructor() {}
 }

@@ -5,14 +5,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { BroadcasterService } from '../../shared/broadcaster.service';
 import { MatDialog } from '@angular/material/dialog';
-import {
-  DialogAddTaskComponent,
-  DialogDeleteTaskComponent,
-} from '../list/list.component';
 import { Subscription } from 'rxjs';
 import { SpinnerService } from '../../shared/spinner.service';
 import { SnackbarService } from '../../shared/snackbar.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { AddTaskComponent } from '../add-task/add-task.component';
+import { DeleteTaskComponent } from '../delete-task/delete-task.component';
 
 @Component({
   selector: 'app-task-detail',
@@ -100,13 +98,13 @@ export class TaskDetailComponent implements OnInit, OnDestroy {
   }
 
   editTask() {
-    this.dialog.open(DialogAddTaskComponent, {
+    this.dialog.open(AddTaskComponent, {
       data: { result: this.taskDetails, editMode: true, id: this.taskId },
     });
   }
 
   deleteTask() {
-    const dialogRef = this.dialog.open(DialogDeleteTaskComponent, {
+    const dialogRef = this.dialog.open(DeleteTaskComponent, {
       data: this.taskDetails,
     });
     dialogRef.afterClosed().subscribe((response) => {
