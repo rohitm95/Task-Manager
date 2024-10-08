@@ -18,9 +18,6 @@ export class AuthService {
   readonly auth: Auth = inject(Auth);
   snackbarService = inject(SnackbarService);
   router = inject(Router);
-  isAuthenticated = false;
-  authState$ = authState(this.auth);
-  user;
 
   constructor() {}
 

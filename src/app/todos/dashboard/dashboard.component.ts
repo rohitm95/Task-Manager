@@ -34,9 +34,7 @@ import { NgOptimizedImage } from '@angular/common';
 })
 export class DashboardComponent implements OnInit {
   opened = true;
-  panelOpenState = false;
   user;
-  displayName = '';
   auth = inject(Auth);
   authService = inject(AuthService);
   authState$ = authState(this.auth);

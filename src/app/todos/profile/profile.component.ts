@@ -31,7 +31,6 @@ import { NgOptimizedImage } from '@angular/common';
   ],
 })
 export class ProfileComponent implements OnInit, OnDestroy {
-  selectedFile;
   auth = inject(Auth);
   authState$ = authState(this.auth);
   profileForm: FormGroup;
