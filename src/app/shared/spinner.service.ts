@@ -6,5 +6,4 @@ import { Subject } from 'rxjs';
 })
 export class SpinnerService {
   showSpinner = new Subject<boolean>();
-  constructor() { }
 }

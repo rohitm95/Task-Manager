@@ -6,7 +6,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class SnackbarService {
   snackbar = inject(MatSnackBar);
-  constructor() {}
 
   showSnackbar(message, action, duration) {
     this.snackbar.open(message, action, { duration: duration });

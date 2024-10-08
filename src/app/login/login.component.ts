@@ -41,8 +41,6 @@ export class LoginComponent implements OnInit {
   subscription: Subscription;
   snackbarService = inject(SnackbarService);
 
-  constructor() {}
-
   ngOnInit(): void {
     this.userLoginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],

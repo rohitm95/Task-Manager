@@ -43,8 +43,6 @@ export class SignupComponent implements OnInit {
   subscription: Subscription;
   spinnerService = inject(SpinnerService);
 
-  constructor() {}
-
   ngOnInit(): void {
     this.userSignupForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],

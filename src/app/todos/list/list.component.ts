@@ -66,8 +66,6 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  constructor() {}
-
   ngOnInit(): void {
     this.broadcast.recieve('reloadList', () => {
       this.getTaskList();

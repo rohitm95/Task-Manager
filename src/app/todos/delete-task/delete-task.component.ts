@@ -12,5 +12,4 @@ import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/materia
 export class DeleteTaskComponent {
   dialogRef = inject(MatDialogRef<DeleteTaskComponent>);
   data = inject(MAT_DIALOG_DATA);
-  constructor() {}
 }

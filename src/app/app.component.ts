@@ -12,10 +12,4 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class AppComponent {
   title = 'Task Manager';
-  private platformId = inject(PLATFORM_ID);
-  static isBrowser = new BehaviorSubject<boolean>(null);
-
-  constructor() {
-    AppComponent.isBrowser.next(isPlatformBrowser(this.platformId))
-  }
 }

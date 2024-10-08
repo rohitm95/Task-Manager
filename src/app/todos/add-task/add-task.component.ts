@@ -52,8 +52,6 @@ export class AddTaskComponent {
   snackbarService = inject(SnackbarService);
   broadcast = inject(BroadcasterService);
 
-  constructor() {}
-
   ngOnInit() {
     this.toDoForm = this.fb.group({
       title: ['', [Validators.required]],

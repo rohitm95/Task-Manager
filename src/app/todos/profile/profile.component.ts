@@ -41,8 +41,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
   storage = inject(Storage);
   snackbarService = inject(SnackbarService);
 
-  constructor() {}
-
   ngOnInit() {
     this.authState$.subscribe((user) => {
       this.userDetails = user;

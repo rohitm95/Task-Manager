@@ -23,7 +23,6 @@ export class TodoService {
   snackbarService = inject(SnackbarService);
   broadcast = inject(BroadcasterService);
   fireStore = inject(Firestore);
-  constructor() {}
 
   fetchUserTasks(userId: string) {
     this.userId = userId;

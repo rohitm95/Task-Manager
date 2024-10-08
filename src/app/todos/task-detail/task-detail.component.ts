@@ -37,8 +37,6 @@ export class TaskDetailComponent implements OnInit, OnDestroy {
   route = inject(ActivatedRoute);
   snackbarService = inject(SnackbarService);
 
-  constructor() {}
-
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
       this.taskId = params['id'];

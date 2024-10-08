@@ -6,7 +6,6 @@ import { Subject, filter, map } from 'rxjs';
 })
 export class BroadcasterService {
   readonly _handler: Subject<Subjects> = new Subject<Subjects>();
-  constructor() {}
 
   broadcast(name, args) {
     this._handler.next({ name, args });

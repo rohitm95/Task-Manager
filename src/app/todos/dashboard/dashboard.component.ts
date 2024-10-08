@@ -39,8 +39,6 @@ export class DashboardComponent implements OnInit {
   authService = inject(AuthService);
   authState$ = authState(this.auth);
 
-  constructor() {}
-
   ngOnInit(): void {
     this.authState$.subscribe((user) => {
       this.user = user;

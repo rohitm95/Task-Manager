@@ -19,8 +19,6 @@ export class AuthService {
   snackbarService = inject(SnackbarService);
   router = inject(Router);
 
-  constructor() {}
-
   registerUser(authData: AuthData) {
     return scheduled(
       createUserWithEmailAndPassword(
