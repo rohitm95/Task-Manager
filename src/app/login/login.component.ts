@@ -15,7 +15,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subscription } from 'rxjs';
 import { SpinnerService } from '../shared/spinner.service';
 import { SnackbarService } from '../shared/snackbar.service';
-import { LocalStorageService } from '../shared/localstorage.service';
 
 @Component({
   selector: 'app-login',
@@ -41,7 +40,6 @@ export class LoginComponent implements OnInit {
   spinnerService = inject(SpinnerService);
   subscription: Subscription;
   snackbarService = inject(SnackbarService);
-  localstorageService = inject(LocalStorageService);
 
   constructor() {}
 
@@ -73,7 +71,7 @@ export class LoginComponent implements OnInit {
         next: (response) => {
           this.spinnerService.showSpinner.next(false);
           this.router.navigate(['/todo-list']);
-          this.localstorageService.setItem(
+          localStorage.setItem(
             'user',
             JSON.stringify(response.user.uid)
           );

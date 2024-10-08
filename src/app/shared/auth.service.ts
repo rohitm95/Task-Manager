@@ -10,7 +10,6 @@ import { SnackbarService } from './snackbar.service';
 import { AuthData } from './auth-data.model';
 import { Router } from '@angular/router';
 import { asyncScheduler, scheduled } from 'rxjs';
-import { LocalStorageService } from './localstorage.service';
 
 @Injectable({
   providedIn: 'root',
@@ -22,7 +21,6 @@ export class AuthService {
   isAuthenticated = false;
   authState$ = authState(this.auth);
   user;
-  localstorageService = inject(LocalStorageService);
 
   constructor() {}
 
@@ -45,7 +43,7 @@ export class AuthService {
   }
 
   logout() {
-    this.localstorageService.removeItem('user');
+    localStorage.removeItem('user');
     signOut(this.auth);
     this.router.navigate(['/login']);
   }
