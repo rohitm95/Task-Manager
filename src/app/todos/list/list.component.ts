@@ -95,9 +95,11 @@ export class ListComponent implements AfterViewInit, OnInit, OnDestroy {
               };
             });
             this.dataSource = new MatTableDataSource<Todo>(availableTasks);
-            this.dataSource.sort = this.sort;
-            this.dataSource.paginator = this.paginator;
             this.data = availableTasks;
+            setTimeout(() => {
+              this.dataSource.sort = this.sort;
+              this.dataSource.paginator = this.paginator;
+            });
             this.spinnerService.showSpinner.next(false);
           },
           error: (error) => {

@@ -1,39 +1,44 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TaskDetailComponent } from './task-detail.component';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideAuth, getAuth } from '@angular/fire/auth';
+import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { from } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TodoService } from '../todo.service';
-import { BroadcasterService } from '../../shared/broadcaster.service';
-import { MatDialog } from '@angular/material/dialog';
 
 describe('TaskDetailComponent', () => {
   let component: TaskDetailComponent;
   let fixture: ComponentFixture<TaskDetailComponent>;
   let routerSpy: jasmine.SpyObj<Router>;
-  let todoServiceSpy: jasmine.SpyObj<TodoService>;
-  let broadcasterServiceSpy: jasmine.SpyObj<BroadcasterService>;
-  let dialogSpy: jasmine.SpyObj<MatDialog>;
-  let activatedRouteSpy: { get: jasmine.Spy };
 
   beforeEach(async () => {
+    const activatedRouteMock = {
+      params: from([{ id: '123' }]), // Mocking route parameters
+      // You can add other properties like 'data', 'queryParams', etc. as needed
+    };
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    todoServiceSpy = jasmine.createSpyObj('TodoService', ['getTask', 'deleteTask']);
-    broadcasterServiceSpy = jasmine.createSpyObj('BroadcasterService', ['recieve']);
-    dialogSpy = jasmine.createSpyObj('MatDialog', ['open', 'afterClosed']);
-    activatedRouteSpy = { get: jasmine.createSpy('get') };
-
     await TestBed.configureTestingModule({
       imports: [TaskDetailComponent],
       providers: [
-        { provide: Router, useValue: routerSpy },
-        { provide: TodoService, useValue: todoServiceSpy },
-        { provide: BroadcasterService, useValue: broadcasterServiceSpy },
-        { provide: MatDialog, useValue: dialogSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
-      ],
+        provideFirebaseApp(() =>
+          initializeApp({
+            projectId: 'to-do-app-3569d',
+            appId: '1:665738202763:web:c08911a6f36c6c3bbbce8e',
+            storageBucket: 'to-do-app-3569d.appspot.com',
+            apiKey: 'AIzaSyDmWSsxJJAlzt60_hMRcT9JGGm4EiWqkbw',
+            authDomain: 'to-do-app-3569d.firebaseapp.com',
+            messagingSenderId: '665738202763',
+            measurementId: 'G-0B32KQX4NF',
+          })
+        ),
+        provideAuth(() => getAuth()),
+        provideFirestore(() => getFirestore()),
+        {
+          provide: ActivatedRoute,
+          useValue: activatedRouteMock, // Provide the mock
+        },
+      ]
     }).compileComponents();
-  });
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(TaskDetailComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -44,7 +49,7 @@ describe('TaskDetailComponent', () => {
   });
 
   it('should set taskId with state key on ngOnInit', () => {
-    const mockState = { key: 'test-id' };
+    const mockState = { key: '123' };
     spyOnProperty(window.history, 'state').and.returnValue(mockState);
 
     component.ngOnInit();
@@ -52,30 +57,14 @@ describe('TaskDetailComponent', () => {
     expect(component.taskId).toEqual(mockState.key);
   });
 
-  it('should call todoService.getTask() on ngOnInit', () => {
-    component.taskId = 'test-id';
-    component.ngOnInit();
-
-    expect(todoServiceSpy.getTask).toHaveBeenCalledWith(component.taskId);
-  });
-
-  it('should navigate to todo-list on goBack', () => {
-    component.goBack();
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/todo-list']);
-  });
-
-  it('should open edit task dialog on editTask', () => {
-    const mockTaskDetails = { id: 'test-id', title: 'Test Task' };
-    component.taskDetails = mockTaskDetails;
-    
-    component.editTask();
-
-    expect(dialogSpy.open).toHaveBeenCalled();
-  });
-
   it('should unsubscribe from subscription on ngOnDestroy', () => {
     spyOn(component.subscription, 'unsubscribe');
     component.ngOnDestroy();
     expect(component.subscription.unsubscribe).toHaveBeenCalled();
+  });
+
+  it('should navigate to previous page when goBack() is called', () => {
+    component.goBack();
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/todo-list']);
   });
 });

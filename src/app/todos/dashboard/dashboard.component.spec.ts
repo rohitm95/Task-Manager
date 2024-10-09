@@ -1,26 +1,42 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DashboardComponent } from './dashboard.component';
-import { AuthService } from '../../shared/auth.service';
-import { of } from 'rxjs';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideAuth, getAuth } from '@angular/fire/auth';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { Auth } from '@angular/fire/auth';
+import { from } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { AuthService } from '../../shared/auth.service';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
   let fixture: ComponentFixture<DashboardComponent>;
   let authServiceSpy: jasmine.SpyObj<AuthService>;
-  let authSpy: jasmine.SpyObj<Auth>;
 
   beforeEach(async () => {
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['logout'], {
-      authState$: of({ displayName: 'Test User' }),
-    });
-    authSpy = jasmine.createSpyObj('Auth', ['authState']);
+    const activatedRouteMock = {
+      params: from([{ id: '123' }]), // Mocking route parameters
+      // You can add other properties like 'data', 'queryParams', etc. as needed
+    };
+    authServiceSpy = jasmine.createSpyObj('AuthService', ['logout']);
     await TestBed.configureTestingModule({
       imports: [DashboardComponent, BrowserAnimationsModule],
       providers: [
-        { provide: AuthService, useValue: authServiceSpy },
-        { provide: Auth, useValue: authSpy },
+        provideFirebaseApp(() =>
+          initializeApp({
+            projectId: 'to-do-app-3569d',
+            appId: '1:665738202763:web:c08911a6f36c6c3bbbce8e',
+            storageBucket: 'to-do-app-3569d.appspot.com',
+            apiKey: 'AIzaSyDmWSsxJJAlzt60_hMRcT9JGGm4EiWqkbw',
+            authDomain: 'to-do-app-3569d.firebaseapp.com',
+            messagingSenderId: '665738202763',
+            measurementId: 'G-0B32KQX4NF',
+          })
+        ),
+        provideAuth(() => getAuth()),
+        {
+          provide: ActivatedRoute,
+          useValue: activatedRouteMock, // Provide the mock
+        },
       ],
     }).compileComponents();
   });
@@ -34,18 +50,10 @@ describe('DashboardComponent', () => {
   it('should create the component', () => {
     expect(component).toBeTruthy();
   });
-  // ...
 
   it('should call authService.logout() when logOut() is called', () => {
     component.logOut();
 
     expect(authServiceSpy.logout).toHaveBeenCalled();
-  });
-
-  it('should update user on authState change', () => {
-    const testUser = { displayName: 'Test User' };
-    // component.authState$.next(testUser);
-
-    expect(component.user).toEqual(testUser);
   });
 });

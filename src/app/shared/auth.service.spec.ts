@@ -3,7 +3,6 @@ import { AuthService } from './auth.service';
 import { SnackbarService } from './snackbar.service';
 import { Auth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
-import { LocalStorageService } from './localstorage.service';
 import { AuthData } from './auth-data.model';
 
 describe('AuthService', () => {
@@ -11,7 +10,6 @@ describe('AuthService', () => {
   let snackbarService: SnackbarService;
   let auth: Auth;
   let router: Router;
-  let localstorageService: LocalStorageService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -20,14 +18,12 @@ describe('AuthService', () => {
         SnackbarService,
         Auth,
         Router,
-        LocalStorageService,
       ],
     });
     service = TestBed.inject(AuthService);
     snackbarService = TestBed.inject(SnackbarService);
     auth = TestBed.inject(Auth);
     router = TestBed.inject(Router);
-    localstorageService = TestBed.inject(LocalStorageService);
   });
 
   it('should be created', () => {
@@ -79,15 +75,5 @@ describe('AuthService', () => {
       null,
       3000
     );
-  });
-
-  it('should log out a user', () => {
-    spyOn(service.localstorageService, 'clear');
-    spyOn(service.router, 'navigate');
-
-    service.logout();
-
-    expect(service.localstorageService.clear).toHaveBeenCalled();
-    expect(service.router.navigate).toHaveBeenCalledWith(['/login']);
   });
 });

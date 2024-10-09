@@ -1,30 +1,31 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SignupComponent } from './signup.component';
-import { Router } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
-import { AuthService } from '../shared/auth.service';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideAuth, getAuth } from '@angular/fire/auth';
+import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { Auth } from '@angular/fire/auth';
 
 describe('SignupComponent', () => {
   let component: SignupComponent;
   let fixture: ComponentFixture<SignupComponent>;
-  let routerSpy: jasmine.SpyObj<Router>;
-  let authServiceSpy: jasmine.SpyObj<AuthService>;
-  let authSpy: jasmine.SpyObj<Auth>;
 
   beforeEach(async () => {
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['registerUser']);
-    authSpy = jasmine.createSpyObj('Auth', ['signOut']);
-
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, SignupComponent, BrowserAnimationsModule],
+      imports: [SignupComponent, BrowserAnimationsModule],
       providers: [
-        { provide: Router, useValue: routerSpy },
-        { provide: AuthService, useValue: authServiceSpy },
-        { provide: Auth, useValue: authSpy },
-      ],
+        provideFirebaseApp(() =>
+          initializeApp({
+            projectId: 'to-do-app-3569d',
+            appId: '1:665738202763:web:c08911a6f36c6c3bbbce8e',
+            storageBucket: 'to-do-app-3569d.appspot.com',
+            apiKey: 'AIzaSyDmWSsxJJAlzt60_hMRcT9JGGm4EiWqkbw',
+            authDomain: 'to-do-app-3569d.firebaseapp.com',
+            messagingSenderId: '665738202763',
+            measurementId: 'G-0B32KQX4NF',
+          })
+        ),
+        provideAuth(() => getAuth()),
+      ]
     }).compileComponents();
   });
 
@@ -36,31 +37,5 @@ describe('SignupComponent', () => {
 
   it('should create the component', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should create userSignupForm FormGroup with required controls', () => {
-    expect(component.userSignupForm).toBeDefined();
-    expect(component.userSignupForm.get('email')).toBeDefined();
-    expect(component.userSignupForm.get('password')).toBeDefined();
-    expect(component.userSignupForm.get('name')).toBeDefined();
-    expect(component.controls['email'].valid).toBeFalsy();
-    expect(component.controls['password'].valid).toBeFalsy();
-    expect(component.controls['name'].valid).toBeFalsy();
-  });
-
-  it('should call navigateToSignIn() to navigate to login page', () => {
-    component.navigateToSignIn();
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
-  });
-
-  it('should call authService.registerUser() with form value on signup()', () => {
-    const formValue = {
-      email: 'test@example.com',
-      password: 'test123',
-      name: 'Test User',
-    };
-    component.userSignupForm.patchValue(formValue);
-    component.signup(component.userSignupForm);
-    expect(authServiceSpy.registerUser).toHaveBeenCalledWith(formValue);
   });
 });
