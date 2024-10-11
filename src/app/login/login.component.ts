@@ -12,9 +12,9 @@ import { AuthService } from '../shared/auth.service';
 import { Router } from '@angular/router';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Subscription } from 'rxjs';
 import { SpinnerService } from '../shared/spinner.service';
 import { SnackbarService } from '../shared/snackbar.service';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-login',
@@ -26,6 +26,7 @@ import { SnackbarService } from '../shared/snackbar.service';
     MatInputModule,
     MatProgressSpinnerModule,
     ReactiveFormsModule,
+    AsyncPipe
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
@@ -33,12 +34,11 @@ import { SnackbarService } from '../shared/snackbar.service';
 export class LoginComponent implements OnInit {
   userLoginForm: FormGroup;
   hide = true;
-  isLoadingResults = false;
+  isLoadingResults;
   authService = inject(AuthService);
   fb = inject(FormBuilder);
   router = inject(Router);
   spinnerService = inject(SpinnerService);
-  subscription: Subscription;
   snackbarService = inject(SnackbarService);
 
   ngOnInit(): void {
@@ -47,11 +47,7 @@ export class LoginComponent implements OnInit {
       password: ['', [Validators.required]],
     });
 
-    this.subscription = this.spinnerService.showSpinner.subscribe(
-      (response) => {
-        this.isLoadingResults = response;
-      }
-    );
+    this.isLoadingResults = this.spinnerService.showSpinner$;
   }
 
   get controls() {
@@ -59,7 +55,7 @@ export class LoginComponent implements OnInit {
   }
 
   login(formData: FormGroup) {
-    this.spinnerService.showSpinner.next(true);
+    this.spinnerService.showSpinner(true);
     this.authService
       .login({
         email: formData.value.email,
@@ -67,7 +63,7 @@ export class LoginComponent implements OnInit {
       })
       .subscribe({
         next: (response) => {
-          this.spinnerService.showSpinner.next(false);
+          this.spinnerService.showSpinner(false);
           this.router.navigate(['/todo-list']);
           localStorage.setItem(
             'user',
@@ -79,14 +75,14 @@ export class LoginComponent implements OnInit {
             error.message ===
             'Firebase: Error (auth/invalid-login-credentials).'
           ) {
-            this.spinnerService.showSpinner.next(false);
+            this.spinnerService.showSpinner(false);
             this.snackbarService.showSnackbar(
               'Invalid login credentials',
               null,
               3000
             );
           } else {
-            this.spinnerService.showSpinner.next(false);
+            this.spinnerService.showSpinner(false);
             this.snackbarService.showSnackbar(error.message, null, 3000);
           }
         },

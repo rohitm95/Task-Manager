@@ -73,7 +73,7 @@ export class AddTaskComponent {
   }
 
   createTask() {
-    this.spinnerService.showSpinner.next(true);
+    this.spinnerService.showSpinner(true);
     this.todoService.addTaskToDatabase(this.toDoForm.value).subscribe({
       next: (response) => {
         this.broadcast.broadcast('reloadList', {});
@@ -95,7 +95,7 @@ export class AddTaskComponent {
   }
 
   updateTask() {
-    this.spinnerService.showSpinner.next(true);
+    this.spinnerService.showSpinner(true);
     const payload = {
       id: this.taskId,
       taskData: this.toDoForm.value,
@@ -106,7 +106,7 @@ export class AddTaskComponent {
         this.broadcast.broadcast('reloadList', {});
         this.broadcast.broadcast('updateTask', { status: 'success' });
         this.snackbarService.showSnackbar('Task Updated!', null, 3000);
-        this.spinnerService.showSpinner.next(false);
+        this.spinnerService.showSpinner(false);
       },
       error: (error) => {
         this.snackbarService.showSnackbar(

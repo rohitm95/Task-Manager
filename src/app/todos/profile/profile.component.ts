@@ -5,7 +5,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Subscription } from 'rxjs';
 import { SpinnerService } from '../../shared/spinner.service';
 import { SnackbarService } from '../../shared/snackbar.service';
 import {
@@ -14,7 +13,7 @@ import {
   Storage,
   getDownloadURL,
 } from '@angular/fire/storage';
-import { NgOptimizedImage } from '@angular/common';
+import { AsyncPipe, NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-profile',
@@ -27,33 +26,31 @@ import { NgOptimizedImage } from '@angular/common';
     ReactiveFormsModule,
     MatProgressSpinnerModule,
     MatButtonModule,
-    NgOptimizedImage
+    NgOptimizedImage,
+    AsyncPipe
   ],
 })
-export class ProfileComponent implements OnInit, OnDestroy {
+export class ProfileComponent implements OnInit {
   auth = inject(Auth);
   authState$ = authState(this.auth);
   profileForm: FormGroup;
   userDetails;
-  subscription: Subscription;
   spinnerService = inject(SpinnerService);
-  isLoadingResults = true;
+  isLoadingResults;
   storage = inject(Storage);
   snackbarService = inject(SnackbarService);
 
   ngOnInit() {
     this.authState$.subscribe((user) => {
       this.userDetails = user;
-      this.spinnerService.showSpinner.next(false);
+      this.spinnerService.showSpinner(false);
     });
 
-    this.subscription = this.spinnerService.showSpinner.subscribe((state) => {
-      this.isLoadingResults = state;
-    });
+    this.isLoadingResults = this.spinnerService.showSpinner$;
   }
 
   uploadSelectedFile(event) {
-    this.spinnerService.showSpinner.next(true);
+    this.spinnerService.showSpinner(true);
     const file = event.target.files[0];
     const storageURL =
       'https://firebasestorage.googleapis.com/v0/b/to-do-app-3569d.appspot.com/o/profile-images';
@@ -72,25 +69,21 @@ export class ProfileComponent implements OnInit, OnDestroy {
                   null,
                   3000
                 );
-                this.spinnerService.showSpinner.next(false);
+                this.spinnerService.showSpinner(false);
               })
               .catch((err) => {
                 console.log(err);
-                this.spinnerService.showSpinner.next(false);
+                this.spinnerService.showSpinner(false);
               });
           })
           .catch((error) => {
-            this.spinnerService.showSpinner.next(false);
+            this.spinnerService.showSpinner(false);
             console.log(error);
           });
       })
       .catch((error) => {
         console.log(error);
-        this.spinnerService.showSpinner.next(false);
+        this.spinnerService.showSpinner(false);
       });
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
   }
 }

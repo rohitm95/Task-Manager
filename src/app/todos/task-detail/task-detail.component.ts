@@ -5,12 +5,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { BroadcasterService } from '../../shared/broadcaster.service';
 import { MatDialog } from '@angular/material/dialog';
-import { Subscription } from 'rxjs';
 import { SpinnerService } from '../../shared/spinner.service';
 import { SnackbarService } from '../../shared/snackbar.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AddTaskComponent } from '../add-task/add-task.component';
 import { DeleteTaskComponent } from '../delete-task/delete-task.component';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-task-detail',
@@ -20,15 +20,15 @@ import { DeleteTaskComponent } from '../delete-task/delete-task.component';
     MatCardModule,
     MatButtonModule,
     MatProgressSpinnerModule,
+    AsyncPipe
   ],
   templateUrl: './task-detail.component.html',
   styleUrl: './task-detail.component.scss',
 })
-export class TaskDetailComponent implements OnInit, OnDestroy {
+export class TaskDetailComponent implements OnInit {
   taskId = '';
   taskDetails;
-  isLoadingResults = true;
-  subscription: Subscription;
+  isLoadingResults;
   spinnerService = inject(SpinnerService);
   router = inject(Router);
   todoService = inject(TodoService);
@@ -56,11 +56,7 @@ export class TaskDetailComponent implements OnInit, OnDestroy {
       this.router.navigate(['/todo-list']);
     });
 
-    this.subscription = this.spinnerService.showSpinner.subscribe(
-      (response) => {
-        this.isLoadingResults = response;
-      }
-    );
+    this.isLoadingResults = this.spinnerService.showSpinner$;
   }
 
   goBack() {
@@ -68,19 +64,19 @@ export class TaskDetailComponent implements OnInit, OnDestroy {
   }
 
   getTaskData() {
-    this.spinnerService.showSpinner.next(true);
+    this.spinnerService.showSpinner(true);
     this.todoService.getTask(this.taskId).subscribe({
       next: (response) => {
         if (response.exists()) {
           this.broadcast.broadcast('taskDetail', { data: response.data() });
-          this.spinnerService.showSpinner.next(false);
+          this.spinnerService.showSpinner(false);
         } else {
           this.snackbarService.showSnackbar(
             'Document does not exist',
             null,
             3000
           );
-          this.spinnerService.showSpinner.next(false);
+          this.spinnerService.showSpinner(false);
         }
       },
       error: (error) => {
@@ -90,7 +86,7 @@ export class TaskDetailComponent implements OnInit, OnDestroy {
           null,
           3000
         );
-        this.spinnerService.showSpinner.next(false);
+        this.spinnerService.showSpinner(false);
       },
     });
   }
@@ -107,7 +103,7 @@ export class TaskDetailComponent implements OnInit, OnDestroy {
     });
     dialogRef.afterClosed().subscribe((response) => {
       if (response) {
-        this.spinnerService.showSpinner.next(true);
+        this.spinnerService.showSpinner(true);
         this.todoService.deleteTask(this.taskId).subscribe({
           next: (response) => {
             this.router.navigate(['/todo-list']);
@@ -127,9 +123,5 @@ export class TaskDetailComponent implements OnInit, OnDestroy {
         });
       }
     });
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
   }
 }

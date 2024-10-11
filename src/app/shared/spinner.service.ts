@@ -5,5 +5,9 @@ import { Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class SpinnerService {
-  showSpinner = new Subject<boolean>();
+  private spinnerSubject = new Subject<boolean>();
+  showSpinner$ = this.spinnerSubject.asObservable();
+  showSpinner(show: boolean) {
+    this.spinnerSubject.next(show);
+  }
 }

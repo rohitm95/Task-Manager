@@ -57,12 +57,6 @@ describe('TaskDetailComponent', () => {
     expect(component.taskId).toEqual(mockState.key);
   });
 
-  it('should unsubscribe from subscription on ngOnDestroy', () => {
-    spyOn(component.subscription, 'unsubscribe');
-    component.ngOnDestroy();
-    expect(component.subscription.unsubscribe).toHaveBeenCalled();
-  });
-
   it('should navigate to previous page when goBack() is called', () => {
     component.goBack();
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/todo-list']);
