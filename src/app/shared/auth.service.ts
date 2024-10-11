@@ -1,12 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import {
   Auth,
-  authState,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
 } from '@angular/fire/auth';
-import { SnackbarService } from './snackbar.service';
 import { AuthData } from './auth-data.model';
 import { Router } from '@angular/router';
 import { asyncScheduler, scheduled } from 'rxjs';
@@ -16,7 +14,6 @@ import { asyncScheduler, scheduled } from 'rxjs';
 })
 export class AuthService {
   readonly auth: Auth = inject(Auth);
-  snackbarService = inject(SnackbarService);
   router = inject(Router);
 
   registerUser(authData: AuthData) {

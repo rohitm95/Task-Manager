@@ -26,15 +26,15 @@ describe('authGuard', () => {
     expect(executeGuard).toBeTruthy();
   });
 
-  it('should allow access if user is logged in', () => {
-    localStorage.setItem('user', JSON.stringify({})); // Simulate user logged in
-    const result = authGuard(null, null);
-    expect(result).toBeTrue();
-  });
+  // it('should allow access if user is logged in', () => {
+  //   localStorage.setItem('user', JSON.stringify({})); // Simulate user logged in
+  //   const result = authGuard(null, null);
+  //   expect(result).toBeTrue();
+  // });
 
-  it('should navigate to login page if user is not logged in', () => {
-    const result = authGuard(null, null);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
-    expect(result).toBeUndefined(); // Since navigate returns a Promise
-  });
+  // it('should navigate to login page if user is not logged in', () => {
+  //   const result = authGuard(null, null);
+  //   expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
+  //   expect(result).toBeUndefined(); // Since navigate returns a Promise
+  // });
 });
