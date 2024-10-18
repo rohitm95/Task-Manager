@@ -4,14 +4,24 @@ import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
+import { throwError } from 'rxjs';
+import { AuthService } from '../shared/auth.service';
+import { SnackbarService } from '../shared/snackbar.service';
+import { SpinnerService } from '../shared/spinner.service';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
   let routerSpy: jasmine.SpyObj<Router>;
+  let authSpy: jasmine.SpyObj<AuthService>;
+  let snackbarSpy: jasmine.SpyObj<SnackbarService>;
+  let spinnerSpy: jasmine.SpyObj<SpinnerService>;
   
   beforeEach(async () => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    authSpy = jasmine.createSpyObj('AuthService', ['login']);
+    snackbarSpy = jasmine.createSpyObj('SnackbarService', ['showSnackbar']);
+    spinnerSpy = jasmine.createSpyObj('SpinnerService', ['showSpinner']);
     await TestBed.configureTestingModule({
       imports: [ LoginComponent, BrowserAnimationsModule ],
       providers: [
@@ -42,5 +52,35 @@ describe('LoginComponent', () => {
   it('should navigate to signup page when navigateToSignUp() is called', () => {
     component.navigateToSignUp();
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/signup']);
+  });
+
+  it('should initialize the form with two controls', () => {
+    component.ngOnInit();
+    expect(component.userLoginForm.contains('email')).toBeTrue();
+    expect(component.userLoginForm.contains('password')).toBeTrue();
+  });
+
+  it('should handle login error with invalid credentials', () => {
+    component.ngOnInit();
+    const errorResponse = { message: 'Firebase: Error (auth/invalid-login-credentials).' };
+    authSpy.login.and.returnValue(throwError(() => new Error(errorResponse.message)));
+
+    component.login(component.userLoginForm);
+
+    expect(spinnerSpy.showSpinner).toHaveBeenCalledWith(true);
+    expect(spinnerSpy.showSpinner).toHaveBeenCalledWith(false);
+    expect(snackbarSpy.showSnackbar).toHaveBeenCalledWith('Invalid login credentials', null, 3000);
+  });
+
+  it('should handle generic login error', () => {
+    component.ngOnInit();
+    const errorResponse = 'Some other error occurred.';
+    authSpy.login.and.returnValue(throwError(() => new Error(errorResponse)));
+
+    component.login(component.userLoginForm);
+
+    expect(spinnerSpy.showSpinner).toHaveBeenCalledWith(true);
+    expect(spinnerSpy.showSpinner).toHaveBeenCalledWith(false);
+    expect(snackbarSpy.showSnackbar).toHaveBeenCalledWith('Some other error occurred.', null, 3000);
   });
 });

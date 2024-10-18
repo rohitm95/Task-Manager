@@ -42,7 +42,7 @@ import { DeleteTaskComponent } from '../delete-task/delete-task.component';
     RouterModule,
     DatePipe,
     MatPaginatorModule,
-    AsyncPipe
+    AsyncPipe,
   ],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
@@ -110,8 +110,8 @@ export class ListComponent implements AfterViewInit, OnInit {
 
   ngAfterViewInit(): void {
     this.getTaskList();
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+    // this.dataSource.sort = this.sort;
+    // this.dataSource.paginator = this.paginator;
   }
 
   viewTask(id) {
